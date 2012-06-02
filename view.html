@@ -8,13 +8,22 @@
 </head>
 <body>
 <h3>Code</h3>
-<div id="code" style="font-family: monospace; white-space: pre"></div>
-<h3>Write a new comment</h3>
 <form method="POST" action="do/newcomment">
+<table cols="3">
+<tr>
+<td>Start</td>
+<td>End</td>
+<td>Code</td>
+</tr>
+<tr>
+<td><div id="line_start"></div></td>
+<td><div id="line_end"></div></td>
+<td><pre id="code" style="font-family: monospace; line-height: 1.6em"></div></td>
+</tr>
+</table>
+<h3>Write a new comment</h3>
 <input type="hidden" name="code_id" id="code_id" value="-1">
 User:<input type="text" name="user"><br>
-Line start:<input type="text" name="line_start"><br>
-Line end:<input type="text" name="line_end"><br>
 <textarea name="text" cols="80" rows="20"></textarea><br>
 <input type="submit">
 </form>

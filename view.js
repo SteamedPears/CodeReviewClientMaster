@@ -4,7 +4,15 @@
 ******************************************************************************/
 (function() {
     function printCode(text) {
-	$('div#code').append(text);
+	$('#code').append(text);
+    }
+
+    function printCodeLine(n,line) {
+	$('div#line_start')
+	    .append('<input name="line_start" type="radio" value="'+n+'"><br>');
+	$('div#line_end')
+	    .append('<input name="line_end" type="radio" value="'+n+'"><br>');
+	printCode(line);
     }
 
     function printComments(text) {
@@ -20,7 +28,10 @@
     }
 
     function writeCode(code) {
-	printCode(code.text);
+	var lines = code.text.split('\n');
+	for(var i in lines) {
+	    printCodeLine(Number(i)+1,lines[i]+'\n');
+	}
 	$('input#code_id').val(code.id);
 	getComments(code.id,writeComments,writeCommentsError);
     }
@@ -31,7 +42,7 @@
 
     function writeComments(comments_ob) {
 	var comments = comments_ob.comments;
-	for(index in comments) {
+	for(var index in comments) {
 	    var toPrint = '';
 	    toPrint += 'User: ' + comments[index].user + '<br>';
 	    toPrint += 'Start: ' + comments[index].line_start + '<br>';
