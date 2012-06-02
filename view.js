@@ -21,6 +21,7 @@
 	}
 	get(query.id,function(ob) { // success
 	    print(ob.text);
+	    $('input#code_id').val(query.id);
 	},function() { // error
 	    print('An error occured');
 	});
