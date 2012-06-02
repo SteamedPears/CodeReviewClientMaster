@@ -3,27 +3,55 @@
 * Copyright 2012, Simon Pratt                                                 *
 ******************************************************************************/
 (function() {
-    function print(text) {
-	var div = $('div#code');
-	div.append(text);
+    function printCode(text) {
+	$('div#code').append(text);
+    }
+
+    function printComments(text) {
+	$('div#comments').append(text);
     }
     
-    function get(id,success_fn,error_fn) {
+    function getCode(id,success_fn,error_fn) {
 	$.get('do/code',{id:id},success_fn);
+    }
+
+    function getComments(id,success_fn,error_fn) {
+	$.get('do/comments',{code_id:id},success_fn);
+    }
+
+    function writeCode(code) {
+	printCode(code.text);
+	$('input#code_id').val(code.id);
+	getComments(code.id,writeComments,writeCommentsError);
+    }
+
+    function writeCodeError() {
+	printCode("An error occured while retrieving code");
+    }
+
+    function writeComments(comments_ob) {
+	var comments = comments_ob.comments;
+	for(index in comments) {
+	    var toPrint = '';
+	    toPrint += 'User: ' + comments[index].user + '<br>';
+	    toPrint += 'Start: ' + comments[index].line_start + '<br>';
+	    toPrint += 'End: ' + comments[index].line_end + '<br>';
+	    toPrint += 'Comment: ' + comments[index].text + '<br><br>';
+	    printComments(toPrint);
+	}
+    }
+
+    function writeCommentsError() {
+	printComments("An error occured while retrieving comments");
     }
     
     // run when ready
     $(document).ready(function() {
 	var query = URI(document.URL).query(true);
 	if(query.id === undefined) {
-	    print('No ID specified');
+	    printCode('No ID specified');
 	    return;
 	}
-	get(query.id,function(ob) { // success
-	    print(ob.text);
-	    $('input#code_id').val(query.id);
-	},function() { // error
-	    print('An error occured');
-	});
+	getCode(query.id,writeCode,writeCodeError);
     });
 })();
