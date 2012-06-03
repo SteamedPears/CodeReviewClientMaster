@@ -7,8 +7,10 @@
 	var toPrint = '<tr>';
 	toPrint += '<td><input name="line_start" type="radio" value="'+n+'"></td>';
 	toPrint += '<td><input name="line_end" type="radio" value="'+n+'"></td>';
-	toPrint += '<td class="pre">'+line+'</td></tr>';
+	toPrint += '<td>'+n+'</td>';
+	toPrint += '<td id="line'+n+'" class="pre"></td></tr>';
 	$('#code_table').append(toPrint);
+	$('td#line'+n).text(line);
     }
 
     function printComments(text) {
