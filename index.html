@@ -1,14 +1,18 @@
 <html>
 <head>
 <title>CodeReview</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">
-</script>
+<link rel="StyleSheet" href="view.css">
 </head>
 <body>
+<h3>CodeReview</h3>
+
+Put the code you would like reviewed in the following text area and
+hit submit, then share the url with your reviewers.
+
 <form action="do/newcode" method="POST">
 <textarea name="text" 
           cols="80" 
-          style="height:90%">
+          style="height:90%;font-size:14pt" class="pre">
 </textarea><br>
 <input type="submit">
 </form>

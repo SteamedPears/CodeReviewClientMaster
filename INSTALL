@@ -1,0 +1,6 @@
+Install Instructions
+======================================================================
+1. Download URI.js and put it into the include directory.
+   https://github.com/medialize/URI.js/blob/gh-pages/src/URI.js
+
+2. Serve this folder in a static web server like nginx.
