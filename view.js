@@ -3,16 +3,12 @@
 * Copyright 2012, Simon Pratt                                                 *
 ******************************************************************************/
 (function() {
-    function printCode(text) {
-	$('#code').append(text);
-    }
-
-    function printCodeLine(n,line) {
-	$('div#line_start')
-	    .append('<input name="line_start" type="radio" value="'+n+'"><br>');
-	$('div#line_end')
-	    .append('<input name="line_end" type="radio" value="'+n+'"><br>');
-	printCode(line);
+    function printCode(n,line) {
+	var toPrint = '<tr>';
+	toPrint += '<td><input name="line_start" type="radio" value="'+n+'"></td>';
+	toPrint += '<td><input name="line_end" type="radio" value="'+n+'"></td>';
+	toPrint += '<td class="pre">'+line+'</td></tr>';
+	$('#code_table').append(toPrint);
     }
 
     function printComments(text) {
@@ -30,7 +26,7 @@
     function writeCode(code) {
 	var lines = code.text.split('\n');
 	for(var i in lines) {
-	    printCodeLine(Number(i)+1,lines[i]+'\n');
+	    printCode(Number(i)+1,lines[i]+'\n');
 	}
 	$('input#code_id').val(code.id);
 	getComments(code.id,writeComments,writeCommentsError);
