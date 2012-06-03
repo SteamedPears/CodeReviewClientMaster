@@ -5,8 +5,25 @@
 </script>
 <script src="include/URI.js"></script>
 <script src="view.js"></script>
+<link rel="StyleSheet" href="view.css">
 </head>
 <body>
-<div id="code"></div>
+<h3>Code</h3>
+<form method="POST" action="do/newcomment">
+<table id="code_table" cols="3">
+<tr>
+<td>Start</td>
+<td>End</td>
+<td>Code</td>
+</tr>
+</table>
+<h3>Write a new comment</h3>
+<input type="hidden" name="code_id" id="code_id" value="-1">
+User:<input type="text" name="user"><br>
+<textarea name="text" cols="80" rows="20"></textarea><br>
+<input type="submit">
+</form>
+<h3>Comments</h3>
+<div id="comments"></div>
 </body>
 </html>
