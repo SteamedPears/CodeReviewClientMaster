@@ -3,6 +3,8 @@
 * Copyright 2012, Simon Pratt                                                 *
 ******************************************************************************/
 (function() {
+    var comments_div;
+    
     function printCode(n,line) {
 	var toPrint = '<tr>';
 	toPrint += '<td><input name="line_start" type="radio" value="'+n+'"></td>';
@@ -14,7 +16,7 @@
     }
 
     function printComments(text) {
-	$('div#comments').append(text);
+	comments_div.append(text);
     }
     
     function getCode(id,success_fn,error_fn) {
@@ -42,12 +44,15 @@
 	var comments = comments_ob.comments;
 	for(var index in comments) {
 	    var toPrint = '';
-	    toPrint += 'User: ' + comments[index].user + '<br>';
+	    toPrint += '<h4><a href="#">User: ' + comments[index].user + '</a></h4>';
+	    toPrint += '<div>'
 	    toPrint += 'Start: ' + comments[index].line_start + '<br>';
 	    toPrint += 'End: ' + comments[index].line_end + '<br>';
-	    toPrint += 'Comment: ' + comments[index].text + '<br><br>';
+	    toPrint += 'Comment: ' + comments[index].text;
+	    toPrint += '</div>';
 	    printComments(toPrint);
 	}
+	comments_div.accordion({ header: "h4" });
     }
 
     function writeCommentsError() {
@@ -56,6 +61,7 @@
     
     // run when ready
     $(document).ready(function() {
+	comments_div = $('div#comments');
 	var query = URI(document.URL).query(true);
 	if(query.id === undefined) {
 	    printCode('No ID specified');
