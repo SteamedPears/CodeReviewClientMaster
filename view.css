@@ -1,4 +1,6 @@
 .pre {
-    font-family: monospace;
+    font: 10px/1.2 Courier, monospace;
     white-space: pre;
+    width: 48em;
+    word-wrap: break-word;
 }
