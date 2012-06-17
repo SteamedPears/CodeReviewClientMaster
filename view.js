@@ -59,9 +59,7 @@
 	    
 	    // content
 	    ob = $('<div>');
-	    ob.append('Start: ' + comments[index].line_start + '<br>');
-	    ob.append('End: ' + comments[index].line_end + '<br>');
-	    ob.append('Comment: ' + comments[index].text);
+	    ob.append(comments[index].text);
 	    ob.append('</div>');
 	    printComments(ob);
 	}
