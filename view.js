@@ -3,7 +3,10 @@
 * Copyright 2012, Simon Pratt                                                 *
 ******************************************************************************/
 (function() {
-    var comments_div;
+    var comments_div,
+    selected_line_start = -1,
+    selected_line_end = -1,
+    highlightColour = 'LightSalmon';
     
     function printCode(n,line) {
 	var toPrint = '<tr>';
@@ -43,16 +46,49 @@
     function writeComments(comments_ob) {
 	var comments = comments_ob.comments;
 	for(var index in comments) {
-	    var toPrint = '';
-	    toPrint += '<h4><a href="#">User: ' + comments[index].user + '</a></h4>';
-	    toPrint += '<div>'
-	    toPrint += 'Start: ' + comments[index].line_start + '<br>';
-	    toPrint += 'End: ' + comments[index].line_end + '<br>';
-	    toPrint += 'Comment: ' + comments[index].text;
-	    toPrint += '</div>';
-	    printComments(toPrint);
+	    // highlight first comment
+	    
+	    // header
+	    var ob = $('<h4>');
+	    ob.append('<a href="#">User: ' + comments[index].user + '</a></h4>');
+	    ob.data('start',comments[index].line_start);
+	    ob.data('end',comments[index].line_end);
+	    printComments(ob);
+	    if(index == 0)
+		commentChange(undefined,{newHeader:ob});
+	    
+	    // content
+	    ob = $('<div>');
+	    ob.append('Start: ' + comments[index].line_start + '<br>');
+	    ob.append('End: ' + comments[index].line_end + '<br>');
+	    ob.append('Comment: ' + comments[index].text);
+	    ob.append('</div>');
+	    printComments(ob);
 	}
-	comments_div.accordion({ header: "h4" });
+	setupAccordion();
+    }
+
+    function highlightLines(start,end,colour) {
+	while(start <= end) {
+	    $('#line' + start).css('background',colour);
+	    ++start;
+	}
+    }
+
+    function commentChange(event, ui) {
+	var start = ui.newHeader.data('start');
+	var end = ui.newHeader.data('end');
+	highlightLines(selected_line_start,selected_line_end,'');
+	highlightLines(start,end,highlightColour);
+	selected_line_start = start;
+	selected_line_end = end;
+    }
+
+    function setupAccordion() {
+	comments_div.accordion({
+	    header: "h4",
+	    change: commentChange
+	});
     }
 
     function writeCommentsError() {

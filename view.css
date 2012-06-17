@@ -4,3 +4,6 @@
     width: 48em;
     word-wrap: break-word;
 }
+td.code {
+    width: 50em;
+}

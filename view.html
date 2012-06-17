@@ -1,39 +1,39 @@
 <html>
-<head>
-<title>CodeReview</title>
-<link href="css/humanity/jquery-ui-1.8.21.custom.css" rel="stylesheet" />
-<link href="view.css" rel="stylesheet">
-<script src="js/jquery-1.7.2.min.js"></script>
-<script src="js/jquery-ui-1.8.21.custom.min.js"></script>
-<script src="include/URI.js"></script>
-<script src="view.js"></script>
-</head>
-<body>
-<h3>CodeReview</h3>
-<table cols="2">
-<tr>
-<td valign="top">
-<form method="POST" action="do/newcomment">
-<table id="code_table" cols="4">
-<tr>
-<td>Start</td>
-<td>End</td>
-<td>Line</td>
-<td>Code</td>
-</tr>
-</table>
-<h3>Write a new comment</h3>
-<input type="hidden" name="code_id" id="code_id" value="-1">
-User:<input type="text" name="user"><br>
-<textarea name="text" cols="80" rows="20"></textarea><br>
-<input type="submit">
-</form>
-</td>
-<td valign="top">
-<h3>Comments</h3>
-<div id="comments"></div>
-</td>
-</tr>
-</table>
-</body>
+  <head>
+    <title>CodeReview</title>
+    <link href="css/humanity/jquery-ui-1.8.21.custom.css" rel="stylesheet" />
+    <link href="view.css" rel="stylesheet">
+      <script src="js/jquery-1.7.2.min.js"></script>
+      <script src="js/jquery-ui-1.8.21.custom.min.js"></script>
+      <script src="include/URI.js"></script>
+      <script src="view.js"></script>
+    </head>
+  <body>
+    <h1>CodeReview</h1>
+    <table cols="2" style="width:100%">
+      <tr>
+	<td valign="top" class="code">
+	  <form method="POST" action="do/newcomment">
+	    <table id="code_table" cols="4">
+	      <tr>
+		<td class="small">Start</td>
+		<td class="small">End</td>
+		<td class="small">Line</td>
+		<td>Code</td>
+	      </tr>
+	    </table>
+	    <h2>Write a new comment</h2>
+	    <input type="hidden" name="code_id" id="code_id" value="-1">
+	    User:<input type="text" name="user"><br>
+	    <textarea name="text" cols="80" rows="20"></textarea><br>
+	    <input type="submit">
+	  </form>
+	</td>
+	<td valign="top">
+	  <h2>Comments</h2>
+	  <div id="comments"></div>
+	</td>
+      </tr>
+    </table>
+  </body>
 </html>
