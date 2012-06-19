@@ -109,7 +109,7 @@
 	var comment_box = $('div#comment_box');
 	comment_box.css('position','absolute');
 	comment_box.css('background',backgroundColour);
-	var top = Number($('#line1').position().top);
+	var top = Number($('#line'+start).position().top);
 	comment_box.css('top',top);
 	var comment_ob = $('#comment1');
 	var left = comment_ob.position().left;
