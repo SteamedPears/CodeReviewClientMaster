@@ -50,7 +50,7 @@
 	    
 	    // header
 	    var ob = $('<h4>');
-	    ob.append('<a href="#">User: ' + comments[index].user + '</a></h4>');
+	    ob.append('<a href="#">' + comments[index].user + '</a></h4>');
 	    ob.data('start',comments[index].line_start);
 	    ob.data('end',comments[index].line_end);
 	    printComments(ob);
