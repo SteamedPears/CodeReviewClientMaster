@@ -77,6 +77,12 @@
 	}
     }
 
+    function modulo(n,m) {
+	while(n < 0)
+	    n += m;
+	return n%m;
+    }
+
     function openComment(n) {
 	clearComments();
 	var i = -1;
@@ -91,14 +97,13 @@
 	comment.css('top',top);
 	var left = $('#comment'+n).position().left;
 	comment.css('left',left);
-	comment.display
 	comment.appendTo($('body'));
 	
 	// previous button
 	var prev = $('<span class="button">');
 	prev.append('Previous');
 	prev.click(function() {
-	    i = (i-1)%num;
+	    i = modulo(i-1,num);
 	    highlightComment(comments[n][i]);
 	    displayComment(comment,comments[n][i]);
 	});
@@ -109,7 +114,7 @@
 	var next = $('<span class="button">');
 	next.append('Next');
 	next.click(function() {
-	    i = (i+1)%num;
+	    i = modulo(i+1,num);
 	    highlightComment(comments[n][i]);
 	    displayComment(comment,comments[n][i]);
 	});
@@ -141,7 +146,6 @@
     }
 
     function highlightComment(comment) {
-	console.dir(comment);
 	clearHighlighting();
 	highlightLines(comment.line_start,
 		       comment.line_end,
