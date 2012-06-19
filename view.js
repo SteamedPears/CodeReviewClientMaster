@@ -306,7 +306,7 @@
 	    }
 	    showCommentBox(line_start,line_end);
 	});
-	$('div#comment_box').mouseup(function() { return false; });
+	$('#comment_form').mouseup(function() { return false; });
 	closeCommentBox();
     });
 })();
