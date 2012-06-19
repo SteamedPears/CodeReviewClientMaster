@@ -4,9 +4,14 @@
  ******************************************************************************/
 (function() {
     var comments_div,
-    selected_line_start = -1,
-    selected_line_end = -1,
+    highlight_start = -1,
+    highlight_end = -1,
+    selection_start = -1,
+    selection_end = -1,
+    backgroundColour = 'White',
     highlightColour = 'LightSalmon',
+    comment_text_ob = null,
+    comment_box_ob = null,
     comments = {};
 
 /******************************************************************************
@@ -19,8 +24,36 @@
 	return n%m;
     }
 
-    function reportError(error) {
-	console.log(error); // good enough for now
+    function logError(text) {
+	console.log('ERROR: ' + text);
+    }
+
+    function reportError(text) {
+	logError(text); // good enough for now
+    }
+
+    // http://www.quirksmode.org/dom/range_intro.html
+    function getSelected() {
+	if(window.getSelection)
+	    return window.getSelection();
+	if(document.getSelection)
+	    return document.getSelection();
+	if(document.selection) // opera
+	    return document.selection.createRange();
+	logError("Couldn't get selected range");
+    }
+    
+    function getRangeObject(selectionObject) {
+	if (selectionObject.getRangeAt)
+	    return selectionObject.getRangeAt(0);
+	else { // Safari!
+	    var range = document.createRange();
+	    range.setStart(selectionObject.anchorNode,
+			   selectionObject.anchorOffset);
+	    range.setEnd(selectionObject.focusNode,
+			 selectionObject.focusOffset);
+	    return range;
+	}
     }
 
 /******************************************************************************
@@ -28,6 +61,8 @@
 ******************************************************************************/
 
     function highlightLines(start,end,colour) {
+	highlight_start = start;
+	highlight_end = end;
 	while(start <= end) {
 	    $('#line' + start).css('background',colour);
 	    ++start;
@@ -35,9 +70,9 @@
     }
 
     function clearHighlighting() {
-	highlightLines(selected_line_start,selected_line_end,'');
-	selected_line_start = -1;
-	selected_line_end = -1;
+	highlightLines(highlight_start,highlight_end,'');
+	highlight_start = -1;
+	highlight_end = -1;
     }
 
     function highlightComment(comment) {
@@ -45,8 +80,6 @@
 	highlightLines(comment.line_start,
 		       comment.line_end,
 		       highlightColour);
-	selected_line_start = comment.line_start;
-	selected_line_end = comment.line_end;
     }
 
 /******************************************************************************
@@ -59,6 +92,36 @@
 
     function getComments(id,success_fn,error_fn) {
 	$.get('do/comments',{code_id:id},success_fn);
+    }
+
+/******************************************************************************
+* Comment Input                                                               *
+******************************************************************************/
+
+    function showCommentBox(start,end) {
+	closeComments();
+	highlightLines(start,end,highlightColour);
+	selection_start = start;
+	selection_end = end;
+	$('input#line_start').val(start);
+	$('span#line_start').text(start);
+	$('input#line_end').val(end);
+	$('span#line_end').text(end);
+	var comment_box = $('div#comment_box');
+	comment_box.css('position','absolute');
+	comment_box.css('background',backgroundColour);
+	var top = Number($('#line1').position().top);
+	comment_box.css('top',top);
+	var left = $('#comment1').position().left;
+	comment_box.css('left',left);
+	comment_box.show();
+    }
+
+    function closeCommentBox() {
+	$('div#comment_box').hide();
+	clearHighlighting();
+	selection_start = -1;
+	selection_end = -1;
     }
     
 /******************************************************************************
@@ -94,6 +157,10 @@
 	for(var i in comments) {
 	    writeComment(i,comments[i]);
 	}
+	if(comment_text_ob === null)
+	    return;
+	comment_text_ob.remove()
+	comment_text_ob = null;
     }
 
     function writeComments(comments_ob) {
@@ -108,18 +175,18 @@
 	var ob = $('<div>');
 	
 	// actual comment
-	var comment = $('<div>');
-	comment.attr('id','selected_comment');
-	comment.css('position','absolute');
+	comment_text_ob = $('<div>');
+	comment_text_ob.attr('id','selected_comment');
+	comment_text_ob.css('position','absolute');
 	
 	var top = Number($('#line'+n).position().top);
 	var height = $('#line'+n).css('height');
 	height = height.substring(0,height.indexOf('px'));
 	top += Number(height);
-	comment.css('top',top);
+	comment_text_ob.css('top',top);
 	var left = $('#comment'+n).position().left;
-	comment.css('left',left);
-	comment.appendTo($('body'));
+	comment_text_ob.css('left',left);
+	comment_text_ob.appendTo($('body'));
 	
 	// previous button
 	var prev = $('<span>');
@@ -128,7 +195,7 @@
 	prev.click(function() {
 	    i = modulo(i-1,num);
 	    highlightComment(comments[n][i]);
-	    displayComment(comment,comments[n][i]);
+	    displayComment(comment_text_ob,comments[n][i]);
 	});
 	ob.append(prev);
 	ob.append(' ');
@@ -140,7 +207,7 @@
 	next.click(function() {
 	    i = modulo(i+1,num);
 	    highlightComment(comments[n][i]);
-	    displayComment(comment,comments[n][i]);
+	    displayComment(comment_text_ob,comments[n][i]);
 	});
 	next.click();
 	ob.append(next);
@@ -151,7 +218,6 @@
 	close.attr('class','button');
 	close.append('X');
 	close.click(function() {
-	    comment.remove();
 	    closeComments()
 	});
 	ob.append(close);
@@ -179,19 +245,18 @@
     
     function buildCodeTable(n,line) {
 	var toPrint = $('<tr>');
-	toPrint.append($('<td>').append($('<input>')
-					.attr('name','line_start')
-					.attr('type','radio')
-					.val(n)));
-	toPrint.append($('<td>').append($('<input>')
-					.attr('name','line_end')
-					.attr('type','radio')
-					.val(n)));
-	toPrint.append($('<td>').text(n));
-	toPrint.append($('<td>').attr('id','line'+n).attr('class','pre'));
+	var line_num = $('<td>');
+	line_num.text(n);
+	line_num.attr('class','small');
+	toPrint.append(line_num);
+	var line_cell = $('<td>');
+	line_cell.attr('id','line'+n);
+	line_cell.attr('class','pre');
+	line_cell.text(line);
+	line_cell.data('line',n);
+	toPrint.append(line_cell);
 	toPrint.append($('<td>').attr('id','comment'+n));
 	$('#code_table').append(toPrint);
-	$('td#line'+n).text(line);
     }
 
     function writeCodeLines(code) {
@@ -209,11 +274,29 @@
 ******************************************************************************/
 
     $(document).ready(function() {
+	// retrieve and display code
 	var query = URI(document.URL).query(true);
 	if(query.id === undefined) {
 	    reportError("Code ID not found");
 	    return;
 	}
 	getCode(query.id,writeCodeLines,reportError);
+
+	// handle text selection
+	$(document).mouseup(function() {
+	    var selected = getSelected();
+	    var range = getRangeObject(selected);
+	    var start_ob = $(range.startContainer.parentElement);
+	    var end_ob = $(range.endContainer.parentElement);
+	    var line_start = start_ob.data('line');
+	    var line_end = end_ob.data('line');
+	    if(line_start === undefined || line_end === undefined) {
+		closeCommentBox();
+		return;
+	    }
+	    showCommentBox(line_start,line_end);
+	});
+	$('div#comment_box').mouseup(function() { return false; });
+	closeCommentBox();
     });
 })();
