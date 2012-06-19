@@ -1,4 +1,21 @@
 .pre {
-    font-family: monospace;
+    font: 10px/1.2 Courier, monospace;
     white-space: pre;
+    width: 48em;
+    word-wrap: break-word;
+}
+td.code {
+    width: 50em;
+}
+td.small {
+    width: 1em;
+}
+table#code_table {
+    width: 100%;
+}
+span.button, div.button {
+    cursor: default;
+    background: LightSalmon;
+    border: solid 1px black;
+    padding: 2px;
 }
