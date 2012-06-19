@@ -85,7 +85,8 @@
     function setupAccordion() {
 	comments_div.accordion({
 	    header: "h4",
-	    change: commentChange
+	    change: commentChange,
+	    collapsible: true
 	});
     }
 
