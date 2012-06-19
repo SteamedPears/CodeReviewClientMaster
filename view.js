@@ -1,30 +1,91 @@
 /******************************************************************************
-* view.js                                                                     *
-* Copyright 2012, Simon Pratt                                                 *
-******************************************************************************/
+ * view.js                                                                     *
+ * Copyright 2012, Simon Pratt                                                 *
+ ******************************************************************************/
 (function() {
     var comments_div,
-    selected_line_start = -1,
-    selected_line_end = -1,
+    highlight_start = -1,
+    highlight_end = -1,
+    selection_start = -1,
+    selection_end = -1,
+    backgroundColour = 'White',
     highlightColour = 'LightSalmon',
+    comment_text_ob = null,
+    comment_box_ob = null,
     comments = {};
-    
-    function printCode(n,line) {
-	var toPrint = '<tr>';
-	toPrint += '<td><input name="line_start" type="radio" value="'+n+'"></td>';
-	toPrint += '<td><input name="line_end" type="radio" value="'+n+'"></td>';
-	toPrint += '<td>'+n+'</td>';
-	toPrint += '<td id="line'+n+'" class="pre"></td>';
-	toPrint += '<td id="comment'+n+'"></td>';
-	toPrint += '</tr>';
-	$('#code_table').append(toPrint);
-	$('td#line'+n).text(line);
+
+/******************************************************************************
+* Utility Functions                                                           *
+******************************************************************************/
+
+    function modulo(n,m) {
+	while(n < 0)
+	    n += m;
+	return n%m;
     }
 
-    function printComments(text) {
-	comments_div.append(text);
+    function logError(text) {
+	console.log('ERROR: ' + text);
+    }
+
+    function reportError(text) {
+	logError(text); // good enough for now
+    }
+
+    // http://www.quirksmode.org/dom/range_intro.html
+    function getSelected() {
+	if(window.getSelection)
+	    return window.getSelection();
+	if(document.getSelection)
+	    return document.getSelection();
+	if(document.selection) // opera
+	    return document.selection.createRange();
+	logError("Couldn't get selected range");
     }
     
+    function getRangeObject(selectionObject) {
+	if (selectionObject.getRangeAt)
+	    return selectionObject.getRangeAt(0);
+	else { // Safari!
+	    var range = document.createRange();
+	    range.setStart(selectionObject.anchorNode,
+			   selectionObject.anchorOffset);
+	    range.setEnd(selectionObject.focusNode,
+			 selectionObject.focusOffset);
+	    return range;
+	}
+    }
+
+/******************************************************************************
+* Highlighting
+******************************************************************************/
+
+    function highlightLines(start,end,colour) {
+	highlight_start = start;
+	highlight_end = end;
+	while(start <= end) {
+	    $('#line' + start).css('background',colour);
+	    ++start;
+	}
+    }
+
+    function clearHighlighting() {
+	highlightLines(highlight_start,highlight_end,'');
+	highlight_start = -1;
+	highlight_end = -1;
+    }
+
+    function highlightComment(comment) {
+	clearHighlighting();
+	highlightLines(comment.line_start,
+		       comment.line_end,
+		       highlightColour);
+    }
+
+/******************************************************************************
+* Data retrieval                                                              *
+******************************************************************************/
+
     function getCode(id,success_fn,error_fn) {
 	$.get('do/code',{id:id},success_fn);
     }
@@ -33,19 +94,39 @@
 	$.get('do/comments',{code_id:id},success_fn);
     }
 
-    function writeCode(code) {
-	if(code === null) return;
-	var lines = code.text.split('\n');
-	for(var i in lines) {
-	    printCode(Number(i)+1,lines[i]+'\n');
-	}
-	$('input#code_id').val(code.id);
-	getComments(code.id,writeComments,writeCommentsError);
+/******************************************************************************
+* Comment Input                                                               *
+******************************************************************************/
+
+    function showCommentBox(start,end) {
+	closeComments();
+	highlightLines(start,end,highlightColour);
+	selection_start = start;
+	selection_end = end;
+	$('input#line_start').val(start);
+	$('span#line_start').text(start);
+	$('input#line_end').val(end);
+	$('span#line_end').text(end);
+	var comment_box = $('div#comment_box');
+	comment_box.css('position','absolute');
+	comment_box.css('background',backgroundColour);
+	var top = Number($('#line1').position().top);
+	comment_box.css('top',top);
+	var left = $('#comment1').position().left;
+	comment_box.css('left',left);
+	comment_box.show();
     }
 
-    function writeCodeError() {
-	printCode("An error occured while retrieving code");
+    function closeCommentBox() {
+	$('div#comment_box').hide();
+	clearHighlighting();
+	selection_start = -1;
+	selection_end = -1;
     }
+    
+/******************************************************************************
+* Comment Display                                                             *
+******************************************************************************/
 
     function buildCommentStructure(comments_ob) {
 	var comments_list = comments_ob.comments;
@@ -58,81 +139,10 @@
 	}
     }
 
-    function writeComments(comments_ob) {
-	buildCommentStructure(comments_ob);
-	closeComments();
-    }
-
     function clearComments() {
 	for(var i in comments) {
 	    $('#comment'+i).text('');
 	}
-    }
-
-    function closeComments() {
-	clearComments();
-	clearHighlighting();
-	for(var i in comments) {
-	    writeComment(i,comments[i]);
-	}
-    }
-
-    function modulo(n,m) {
-	while(n < 0)
-	    n += m;
-	return n%m;
-    }
-
-    function openComment(n) {
-	clearComments();
-	var i = -1;
-	var num = comments[n].length;
-	var ob = $('<div>');
-
-	// actual comment
-	var comment = $('<div>');
-	comment.attr('id','selected_comment');
-	comment.css('position','absolute');
-	var top = $('#line'+(1+Number(n))).position().top;
-	comment.css('top',top);
-	var left = $('#comment'+n).position().left;
-	comment.css('left',left);
-	comment.appendTo($('body'));
-	
-	// previous button
-	var prev = $('<span class="button">');
-	prev.append('Previous');
-	prev.click(function() {
-	    i = modulo(i-1,num);
-	    highlightComment(comments[n][i]);
-	    displayComment(comment,comments[n][i]);
-	});
-	ob.append(prev);
-	ob.append(' ');
-	
-	// next button
-	var next = $('<span class="button">');
-	next.append('Next');
-	next.click(function() {
-	    i = modulo(i+1,num);
-	    highlightComment(comments[n][i]);
-	    displayComment(comment,comments[n][i]);
-	});
-	next.click();
-	ob.append(next);
-	ob.append(' ');
-
-	// close button
-	var close = $('<span class="button">');
-	close.append('X');
-	close.click(function() {
-	    comment.remove();
-	    closeComments()
-	});
-	ob.append(close);
-	
-	// add all to document
-	$('#comment'+n).append(ob);
     }
 
     function displayComment(dom_ob,comment_ob) {
@@ -141,47 +151,152 @@
 	dom_ob.append($('<span>').text(comment_ob.text));
     }
 
-    function clearHighlighting() {
-	highlightLines(selected_line_start,selected_line_end,'');
+    function closeComments() {
+	clearComments();
+	clearHighlighting();
+	for(var i in comments) {
+	    writeComment(i,comments[i]);
+	}
+	if(comment_text_ob === null)
+	    return;
+	comment_text_ob.remove()
+	comment_text_ob = null;
     }
 
-    function highlightComment(comment) {
-	clearHighlighting();
-	highlightLines(comment.line_start,
-		       comment.line_end,
-		       highlightColour);
-	selected_line_start = comment.line_start;
-	selected_line_end = comment.line_end;
+    function writeComments(comments_ob) {
+	buildCommentStructure(comments_ob);
+	closeComments();
+    }
+
+    function openComment(n) {
+	clearComments();
+	var i = -1;
+	var num = comments[n].length;
+	var ob = $('<div>');
+	
+	// actual comment
+	comment_text_ob = $('<div>');
+	comment_text_ob.attr('id','selected_comment');
+	comment_text_ob.css('position','absolute');
+	
+	var top = Number($('#line'+n).position().top);
+	var height = $('#line'+n).css('height');
+	height = height.substring(0,height.indexOf('px'));
+	top += Number(height);
+	comment_text_ob.css('top',top);
+	var left = $('#comment'+n).position().left;
+	comment_text_ob.css('left',left);
+	comment_text_ob.appendTo($('body'));
+	
+	// previous button
+	var prev = $('<span>');
+	prev.attr('class','button');
+	prev.append('Previous');
+	prev.click(function() {
+	    i = modulo(i-1,num);
+	    highlightComment(comments[n][i]);
+	    displayComment(comment_text_ob,comments[n][i]);
+	});
+	ob.append(prev);
+	ob.append(' ');
+	
+	// next button
+	var next = $('<span>');
+	next.attr('class','button');
+	next.append('Next');
+	next.click(function() {
+	    i = modulo(i+1,num);
+	    highlightComment(comments[n][i]);
+	    displayComment(comment_text_ob,comments[n][i]);
+	});
+	next.click();
+	ob.append(next);
+	ob.append(' ');
+
+	// close button
+	var close = $('<span>');
+	close.attr('class','button');
+	close.append('X');
+	close.click(function() {
+	    closeComments()
+	});
+	ob.append(close);
+	
+	// add all to document
+	$('#comment'+n).append(ob);
     }
 
     function writeComment(n,comment) {
-	var ob = $('<div class="button">');
-	ob.text(comment.length + " comment(s)");
+	var ob = $('<div>');
+	ob.attr('class','button');
+	var text = comment.length + " comment";
+	if(comment.length > 1)
+	    text += "s";
+	ob.text(text);
 	ob.click(function() {
 	    openComment(n);
 	});
 	$('#comment'+n).append(ob);
     }
-
-    function highlightLines(start,end,colour) {
-	while(start <= end) {
-	    $('#line' + start).css('background',colour);
-	    ++start;
-	}
+    
+/******************************************************************************
+* Code Display                                                                *
+******************************************************************************/
+    
+    function buildCodeTable(n,line) {
+	var toPrint = $('<tr>');
+	var line_num = $('<td>');
+	line_num.text(n);
+	line_num.attr('class','small');
+	toPrint.append(line_num);
+	var line_cell = $('<td>');
+	line_cell.attr('id','line'+n);
+	line_cell.attr('class','pre');
+	line_cell.text(line);
+	line_cell.data('line',n);
+	toPrint.append(line_cell);
+	toPrint.append($('<td>').attr('id','comment'+n));
+	$('#code_table').append(toPrint);
     }
 
-    function writeCommentsError() {
-	printComments("An error occured while retrieving comments");
+    function writeCodeLines(code) {
+	if(code === null) return;
+	var lines = code.text.split('\n');
+	for(var i in lines) {
+	    buildCodeTable(Number(i)+1,lines[i]+'\n');
+	}
+	$('input#code_id').val(code.id);
+	getComments(code.id,writeComments,reportError);
     }
     
-    // run when ready
+/******************************************************************************
+* Run when display ready                                                      *
+******************************************************************************/
+
     $(document).ready(function() {
-	comments_div = $('div#comments');
+	// retrieve and display code
 	var query = URI(document.URL).query(true);
 	if(query.id === undefined) {
-	    printCode('No ID specified');
+	    reportError("Code ID not found");
 	    return;
 	}
-	getCode(query.id,writeCode,writeCodeError);
+	getCode(query.id,writeCodeLines,reportError);
+
+	// handle text selection
+	$(document).mouseup(function() {
+	    var selected = getSelected();
+	    var range = getRangeObject(selected);
+	    var start_ob = $(range.startContainer.parentElement);
+	    var end_ob = $(range.endContainer.parentElement);
+	    var line_start = start_ob.data('line');
+	    var line_end = end_ob.data('line');
+	    if(line_start === undefined || line_end === undefined) {
+		closeCommentBox();
+		return;
+	    }
+	    showCommentBox(line_start,line_end);
+	});
+	$('div#comment_box').mouseup(function() { return false; });
+	closeCommentBox();
     });
 })();
