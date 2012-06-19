@@ -196,6 +196,10 @@
 	var left = $('#comment'+n).position().left;
 	comment_text_ob.css('left',left);
 	comment_text_ob.appendTo($('body'));
+
+	// make the comment box bigger
+	var text_height = comment_text_ob.height();
+	comment_text_ob.css('height',text_height+300);
 	
 	// previous button
 	var prev = $('<span>');
