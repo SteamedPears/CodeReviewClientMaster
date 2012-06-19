@@ -12,6 +12,7 @@
     highlightColour = 'LightSalmon',
     comment_text_ob = null,
     comment_box_ob = null,
+    num_lines = -1,
     comments = {};
 
 /******************************************************************************
@@ -104,16 +105,24 @@
 	selection_start = start;
 	selection_end = end;
 	$('input#line_start').val(start);
-	$('span#line_start').text(start);
 	$('input#line_end').val(end);
-	$('span#line_end').text(end);
 	var comment_box = $('div#comment_box');
 	comment_box.css('position','absolute');
 	comment_box.css('background',backgroundColour);
 	var top = Number($('#line1').position().top);
 	comment_box.css('top',top);
-	var left = $('#comment1').position().left;
+	var comment_ob = $('#comment1');
+	var left = comment_ob.position().left;
 	comment_box.css('left',left);
+	var width = comment_ob.css('width');
+	width = width.substring(0,width.indexOf('px'));
+	comment_box.css('width',width);
+	$('input#user').css('width',width);
+	var last_line_ob = $('#line'+num_lines);
+	var height = last_line_ob.css('height');
+	height = Number(height.substring(0,height.indexOf('px')));
+	height += Number(last_line_ob.position().top);
+	comment_box.css('height',height);
 	comment_box.show();
     }
 
@@ -187,6 +196,10 @@
 	var left = $('#comment'+n).position().left;
 	comment_text_ob.css('left',left);
 	comment_text_ob.appendTo($('body'));
+
+	// make the comment box bigger
+	var text_height = comment_text_ob.height();
+	comment_text_ob.css('height',text_height+300);
 	
 	// previous button
 	var prev = $('<span>');
@@ -262,6 +275,7 @@
     function writeCodeLines(code) {
 	if(code === null) return;
 	var lines = code.text.split('\n');
+	num_lines = lines.length;
 	for(var i in lines) {
 	    buildCodeTable(Number(i)+1,lines[i]+'\n');
 	}
@@ -296,7 +310,7 @@
 	    }
 	    showCommentBox(line_start,line_end);
 	});
-	$('div#comment_box').mouseup(function() { return false; });
+	$('#comment_form').mouseup(function() { return false; });
 	closeCommentBox();
     });
 })();

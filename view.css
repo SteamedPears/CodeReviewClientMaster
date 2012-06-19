@@ -19,3 +19,14 @@ span.button, div.button {
     border: solid 1px black;
     padding: 2px;
 }
+input#user {
+    width: 20em;
+}
+textarea#text {
+    width: 100%;
+    resize: none;
+    height: 40em;
+}
+div#comment_box {
+    padding: 2px;
+}
