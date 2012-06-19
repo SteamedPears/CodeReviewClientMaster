@@ -6,14 +6,17 @@
     var comments_div,
     selected_line_start = -1,
     selected_line_end = -1,
-    highlightColour = 'LightSalmon';
+    highlightColour = 'LightSalmon',
+    comments = {};
     
     function printCode(n,line) {
 	var toPrint = '<tr>';
 	toPrint += '<td><input name="line_start" type="radio" value="'+n+'"></td>';
 	toPrint += '<td><input name="line_end" type="radio" value="'+n+'"></td>';
 	toPrint += '<td>'+n+'</td>';
-	toPrint += '<td id="line'+n+'" class="pre"></td></tr>';
+	toPrint += '<td id="line'+n+'" class="pre"></td>';
+	toPrint += '<td id="comment'+n+'"></td>';
+	toPrint += '</tr>';
 	$('#code_table').append(toPrint);
 	$('td#line'+n).text(line);
     }
@@ -31,6 +34,7 @@
     }
 
     function writeCode(code) {
+	if(code === null) return;
 	var lines = code.text.split('\n');
 	for(var i in lines) {
 	    printCode(Number(i)+1,lines[i]+'\n');
@@ -43,27 +47,116 @@
 	printCode("An error occured while retrieving code");
     }
 
-    function writeComments(comments_ob) {
-	var comments = comments_ob.comments;
-	for(var index in comments) {
-	    // highlight first comment
-	    
-	    // header
-	    var ob = $('<h4>');
-	    ob.append('<a href="#">' + comments[index].user + '</a></h4>');
-	    ob.data('start',comments[index].line_start);
-	    ob.data('end',comments[index].line_end);
-	    printComments(ob);
-	    if(index == 0)
-		commentChange(undefined,{newHeader:ob});
-	    
-	    // content
-	    ob = $('<div>');
-	    ob.append(comments[index].text);
-	    ob.append('</div>');
-	    printComments(ob);
+    function buildCommentStructure(comments_ob) {
+	var comments_list = comments_ob.comments;
+	for(var index in comments_list) {
+	    var comment = comments_list[index];
+	    var line_start = comment.line_start;
+	    if(comments[line_start] === undefined)
+		comments[line_start] = [];
+	    comments[line_start].push(comment);
 	}
-	setupAccordion();
+    }
+
+    function writeComments(comments_ob) {
+	buildCommentStructure(comments_ob);
+	closeComments();
+    }
+
+    function clearComments() {
+	for(var i in comments) {
+	    $('#comment'+i).text('');
+	}
+    }
+
+    function closeComments() {
+	clearComments();
+	clearHighlighting();
+	for(var i in comments) {
+	    writeComment(i,comments[i]);
+	}
+    }
+
+    function openComment(n) {
+	clearComments();
+	var i = -1;
+	var num = comments[n].length;
+	var ob = $('<div>');
+
+	// actual comment
+	var comment = $('<div>');
+	comment.attr('id','selected_comment');
+	comment.css('position','absolute');
+	var top = $('#line'+(1+Number(n))).position().top;
+	comment.css('top',top);
+	var left = $('#comment'+n).position().left;
+	comment.css('left',left);
+	comment.display
+	comment.appendTo($('body'));
+	
+	// previous button
+	var prev = $('<span class="button">');
+	prev.append('Previous');
+	prev.click(function() {
+	    i = (i-1)%num;
+	    highlightComment(comments[n][i]);
+	    displayComment(comment,comments[n][i]);
+	});
+	ob.append(prev);
+	ob.append(' ');
+	
+	// next button
+	var next = $('<span class="button">');
+	next.append('Next');
+	next.click(function() {
+	    i = (i+1)%num;
+	    highlightComment(comments[n][i]);
+	    displayComment(comment,comments[n][i]);
+	});
+	next.click();
+	ob.append(next);
+	ob.append(' ');
+
+	// close button
+	var close = $('<span class="button">');
+	close.append('X');
+	close.click(function() {
+	    comment.remove();
+	    closeComments()
+	});
+	ob.append(close);
+	
+	// add all to document
+	$('#comment'+n).append(ob);
+    }
+
+    function displayComment(dom_ob,comment_ob) {
+	dom_ob.text('');
+	dom_ob.append($('<h3>').text(comment_ob.user));
+	dom_ob.append($('<span>').text(comment_ob.text));
+    }
+
+    function clearHighlighting() {
+	highlightLines(selected_line_start,selected_line_end,'');
+    }
+
+    function highlightComment(comment) {
+	console.dir(comment);
+	clearHighlighting();
+	highlightLines(comment.line_start,
+		       comment.line_end,
+		       highlightColour);
+	selected_line_start = comment.line_start;
+	selected_line_end = comment.line_end;
+    }
+
+    function writeComment(n,comment) {
+	var ob = $('<div class="button">');
+	ob.text(comment.length + " comment(s)");
+	ob.click(function() {
+	    openComment(n);
+	});
+	$('#comment'+n).append(ob);
     }
 
     function highlightLines(start,end,colour) {
@@ -71,23 +164,6 @@
 	    $('#line' + start).css('background',colour);
 	    ++start;
 	}
-    }
-
-    function commentChange(event, ui) {
-	var start = ui.newHeader.data('start');
-	var end = ui.newHeader.data('end');
-	highlightLines(selected_line_start,selected_line_end,'');
-	highlightLines(start,end,highlightColour);
-	selected_line_start = start;
-	selected_line_end = end;
-    }
-
-    function setupAccordion() {
-	comments_div.accordion({
-	    header: "h4",
-	    change: commentChange,
-	    collapsible: true
-	});
     }
 
     function writeCommentsError() {
