@@ -173,6 +173,9 @@
     }
 
     function writeComments(comments_ob) {
+    if((typeof comments_ob) == "string"){
+    	comments_ob = jQuery.parseJSON(comments_ob);
+    }
 	buildCommentStructure(comments_ob);
 	closeComments();
     }
@@ -273,14 +276,17 @@
     }
 
     function writeCodeLines(code) {
-	if(code === null) return;
-	var lines = code.text.split('\n');
-	num_lines = lines.length;
-	for(var i in lines) {
-	    buildCodeTable(Number(i)+1,lines[i]+'\n');
-	}
-	$('input#code_id').val(code.id);
-	getComments(code.id,writeComments,reportError);
+		if(code === null) return;
+		if((typeof code) == "string"){
+			code = jQuery.parseJSON(code);
+		}
+		var lines = code.text.split('\n');
+		num_lines = lines.length;
+		for(var i in lines) {
+			 buildCodeTable(Number(i)+1,lines[i]+'\n');
+		}
+		$('input#code_id').val(code.id);
+		getComments(code.id,writeComments,reportError);
     }
     
 /******************************************************************************
