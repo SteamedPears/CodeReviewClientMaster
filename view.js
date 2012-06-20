@@ -30,7 +30,8 @@
     }
 
     function reportError(text) {
-	logError(text); // good enough for now
+	logError(text);
+	$('#error').text(text);
     }
 
     // http://www.quirksmode.org/dom/range_intro.html
@@ -55,6 +56,10 @@
 			 selectionObject.focusOffset);
 	    return range;
 	}
+    }
+
+    function handleAjaxError(jqXHR, textStatus, errorThrown) {
+	reportError(errorThrown);
     }
 
 /******************************************************************************
@@ -88,11 +93,21 @@
 ******************************************************************************/
 
     function getCode(id,success_fn,error_fn) {
-	$.get('do/code',{id:id},success_fn);
+	$.ajax('do/code',{
+	    data:     {id:id},
+	    dataType: 'json',
+	    error:    error_fn,
+	    success:  success_fn
+	});
     }
 
     function getComments(id,success_fn,error_fn) {
-	$.get('do/comments',{code_id:id},success_fn);
+	$.ajax('do/comments',{
+	    data:     {code_id:id},
+	    dataType: 'json',
+	    error:    error_fn,
+	    success:  success_fn
+	});
     }
 
 /******************************************************************************
@@ -280,7 +295,7 @@
 	    buildCodeTable(Number(i)+1,lines[i]+'\n');
 	}
 	$('input#code_id').val(code.id);
-	getComments(code.id,writeComments,reportError);
+	getComments(code.id,writeComments,handleAjaxError);
     }
     
 /******************************************************************************
@@ -294,7 +309,7 @@
 	    reportError("Code ID not found");
 	    return;
 	}
-	getCode(query.id,writeCodeLines,reportError);
+	getCode(query.id,writeCodeLines,handleAjaxError);
 
 	// handle text selection
 	$(document).mouseup(function() {
