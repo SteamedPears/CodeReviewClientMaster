@@ -30,3 +30,7 @@ textarea#text {
 div#comment_box {
     padding: 2px;
 }
+div#error {
+    background-color: Red;
+    color: White;
+}
