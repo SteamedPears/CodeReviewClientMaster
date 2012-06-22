@@ -305,6 +305,9 @@
     $(document).ready(function() {
 	// retrieve and display code
 	var query = URI(document.URL).query(true);
+	if(query.error != undefined) {
+	    reportError(query.error);
+	}
 	if(query.id === undefined) {
 	    reportError("Code ID not found");
 	    return;
