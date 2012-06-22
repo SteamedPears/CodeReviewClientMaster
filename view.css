@@ -1,10 +1,10 @@
-.pre {
-    font: 10px/1.2 Courier, monospace;
-    white-space: pre;
-    width: 48em;
-    word-wrap: break-word;
+pre, code {
+    width: 50em;
+    margin-bottom: 0px;
+    padding: 0px 0px;
 }
 td.code {
+    font-size: 12px;
     width: 50em;
 }
 td.small {

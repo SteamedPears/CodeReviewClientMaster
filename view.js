@@ -70,6 +70,7 @@
 	highlight_start = start;
 	highlight_end = end;
 	while(start <= end) {
+	    $('#line_pre' + start).css('background',colour);
 	    $('#line' + start).css('background',colour);
 	    ++start;
 	}
@@ -104,6 +105,15 @@
     function getComments(id,success_fn,error_fn) {
 	$.ajax('do/comments',{
 	    data:     {code_id:id},
+	    dataType: 'json',
+	    error:    error_fn,
+	    success:  success_fn
+	});
+    }
+
+    function getLanguage(id,success_fn,error_fn) {
+	$.ajax('do/language',{
+	    data:     {id:id},
 	    dataType: 'json',
 	    error:    error_fn,
 	    success:  success_fn
@@ -271,18 +281,27 @@
 * Code Display                                                                *
 ******************************************************************************/
     
-    function buildCodeTable(n,line) {
+    function buildCodeTable(n,line,language_code) {
 	var toPrint = $('<tr>');
 	var line_num = $('<td>');
 	line_num.text(n);
 	line_num.attr('class','small');
 	toPrint.append(line_num);
 	var line_cell = $('<td>');
-	line_cell.attr('id','line'+n);
-	line_cell.attr('class','pre');
-	line_cell.text(line);
+	line_cell.attr('class','code');
 	line_cell.data('line',n);
+	line_cell.attr('id','line_cell'+n);
 	toPrint.append(line_cell);
+	var line_pre = $('<pre>');
+	line_pre.data('line',n);
+	line_pre.attr('id','line_pre'+n);
+	line_cell.append(line_pre);
+	var line_code = $('<code>')
+	line_code.attr('id','line'+n);
+	line_code.text(line);
+	line_code.data('line',n);
+	line_code.attr('data-language',language_code);
+	line_pre.append(line_code);
 	toPrint.append($('<td>').attr('id','comment'+n));
 	$('#code_table').append(toPrint);
     }
@@ -291,11 +310,28 @@
 	if(code === null) return;
 	var lines = code.text.split('\n');
 	num_lines = lines.length;
-	for(var i in lines) {
-	    buildCodeTable(Number(i)+1,lines[i]+'\n');
-	}
-	$('input#code_id').val(code.id);
+	getLanguage(code.language_id,function(language) {
+	    for(var i in lines) {
+		buildCodeTable(Number(i)+1,lines[i]+'\n',language.code);
+	    }
+	    $('input#code_id').val(code.id);
+	    highlightSyntax(language);
+	},handleAjaxError);
 	getComments(code.id,writeComments,handleAjaxError);
+    }
+
+    function highlightSyntax(language) {
+	if(language === null ||
+	   language.code === undefined ||
+	   language.code === 'none')
+	    return;
+	// load the appropriate language script
+	var language_script = $('<script>');
+	language_script.attr('src',
+			     'include/rainbow/js/language/'+language.code+'.js');
+	$('head').append(language_script);
+	// call rainbow
+	Rainbow.color();
     }
     
 /******************************************************************************
@@ -323,8 +359,14 @@
 	    var line_start = start_ob.data('line');
 	    var line_end = end_ob.data('line');
 	    if(line_start === undefined || line_end === undefined) {
-		closeCommentBox();
-		return;
+		start_ob = start_ob.parent().parent();
+		end_ob = end_ob.parent().parent();
+		line_start = start_ob.data('line');
+		line_end = end_ob.data('line');
+		if(line_start === undefined || line_end === undefined) {
+		    closeCommentBox();
+		    return;
+		}
 	    }
 	    showCommentBox(line_start,line_end);
 	});
