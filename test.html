@@ -1,0 +1,21 @@
+<html>
+  <body>
+    Code
+    <form action="do/newcode" method="POST">
+      <textarea name="text" 
+		cols="80" 
+		style="height:90%;font-size:14pt" class="pre">
+      </textarea><br>
+      <input type="submit">
+    </form><br>
+    Comment
+    <form id="comment_form" method="POST" action="do/newcomment">
+      ID:<input type="text" name="code_id" id="code_id" value="-1"><br>
+      Start:<input type="text" name="line_start" id="line_start" value="-1"><br>
+      End:<input type="text" name="line_end" id="line_end" value="-1"><br>
+      User:<input id="user" type="text" name="user" value="Anonymous"><br>
+      <textarea id="text" name="text"></textarea><br>
+      <input type="submit">
+    </form>
+  </body>
+</html>
