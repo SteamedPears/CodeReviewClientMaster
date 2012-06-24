@@ -1,30 +1,39 @@
 <html>
   <head>
     <title>CodeReview</title>
+    <!-- CSS -->
     <link href="include/rainbow/themes/github.css" rel="stylesheet">
     <link href="view.css" rel="stylesheet">
+    <link rel="stylesheet" href="include/CodeMirror/lib/codemirror.css">
+   
+    
+    <!-- JS -->
     <script src="include/rainbow/js/rainbow.min.js"></script>
     <script src="include/rainbow/js/language/generic.js"></script>
     <script src="js/jquery-1.7.2.min.js"></script>
     <script src="include/URI.js"></script>
     <script src="view.js"></script>
+    <script src="include/CodeMirror/lib/codemirror.js"></script>
   </head>
   <body>
     <h1><a href="index.html">CodeReview</a></h1>
     <div id="error"></div>
-    <table id="code_table" cols="5">
-    </table>
-    <div id="comment_box">
-      <form id="comment_form" method="POST" action="do/newcomment">
-        <input type="hidden" name="code_id" id="code_id" value="-1">
-        <input type="hidden" name="line_start" id="line_start" value="-1">
-        <input type="hidden" name="line_end" id="line_end" value="-1">
-        <input id="user" type="text" name="user" value="Anonymous"><br>
-        <textarea id="text" name="text"></textarea><br>
-        <input type="submit">
-      </form>
+    <div id="codeDiv">
+    	<textarea id="code"></textarea>
     </div>
-    <div id="comment_window" class="window">
+    <div id="commentsDiv">
+		<div id="comment_box">
+		  <form id="comment_form" method="POST" action="do/newcomment">
+		    <input type="hidden" name="code_id" id="code_id" value="-1">
+		    <input type="hidden" name="line_start" id="line_start" value="-1">
+		    <input type="hidden" name="line_end" id="line_end" value="-1">
+		    <input id="user" type="text" name="user" value="Anonymous"><br>
+		    <textarea id="text" name="text"></textarea><br>
+		    <input type="submit">
+		  </form>
+		</div>
+	</div>
+    <!--<div id="comment_window" class="window">
       <div id="title_bar">
         <span id="user_name" class="left user_name"></span>
         <span id="prev_button" class="right button">&lt;</span>
@@ -32,6 +41,6 @@
         <span id="close_button" class="right button">X</span>
       </div>
       <div id="comment_text"></div>
-    </div>
+    </div>-->
   </body>
 </html>

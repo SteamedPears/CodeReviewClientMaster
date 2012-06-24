@@ -2,11 +2,7 @@
  * view.js                                                                     *
  * Copyright 2012, Alexis Beingessner and Simon Pratt                          *
  ******************************************************************************/
-pre, code {
-    width: 50em;
-    margin-bottom: 0px;
-    padding: 0px 0px;
-}
+
 td.code {
     font-size: 12px;
     width: 50em;
@@ -26,13 +22,7 @@ td.small {
 #comment_text {
     margin: 3px;
 }
-.window {
-    border: solid 1px black;
-    background-color: #f8f8f8;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-}
+
 .user_name {
     font-size: 14px;
     font-weight: bold;
@@ -45,6 +35,25 @@ td.small {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
+
+.commentBox {
+    border: solid 1px black;
+    background-color: #f8f8f8;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.commentTitle{
+	background-color: #ccc;
+}
+.commentBody{
+	margin: 3px;
+}
+.commentSet{
+	width=50%;
+}
+
 #user {
     width: 20em;
 }
@@ -74,6 +83,35 @@ td.small {
 
 #prev_button, #next_button, #close_button {
     width: 20px;
+}
+
+#codeDiv{
+	width:50%;
+	height:100%;
+	float:right;
+}
+
+#commentsDiv{
+	width:50%;
+	height:100%;
+	float:left;
+}
+
+#code{
+	width:100%;
+	height:auto;
+}
+
+.CodeMirror-gutter {
+	width: 5em;
+	background: white;
+}
+.CodeMirror {
+	border: 1px solid #aaa;
+}
+
+.commentNumber{
+	float:left;
 }
 
 /*
