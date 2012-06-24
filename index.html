@@ -1,20 +1,25 @@
 <html>
-<head>
-<title>CodeReview</title>
-<link rel="StyleSheet" href="view.css">
-</head>
-<body>
-<h3>CodeReview</h3>
+  <head>
+    <title>CodeReview</title>
+    <link rel="StyleSheet" href="view.css">
+    <script src="js/jquery-1.7.2.min.js"></script>
+    <script src="include/URI.js"></script>
+    <script src="index.js"></script>
+  </head>
+  <body>
+    <h1><a href="index.html">CodeReview</a></h1>
+    <div id="error"></div>
 
-Put the code you would like reviewed in the following text area and
-hit submit, then share the url with your reviewers.
+    Put the code you would like reviewed in the following text area and
+    hit submit, then share the url with your reviewers.
 
-<form action="do/newcode" method="POST">
-<textarea name="text" 
-          cols="80" 
-          style="height:90%;font-size:14pt" class="pre">
-</textarea><br>
-<input type="submit">
-</form>
-</body>
+    <form action="do/newcode" method="POST">
+      <textarea name="text" 
+		cols="80" 
+		style="height:90%;font-size:14pt" class="pre"></textarea><br>
+      <select id="language_id" name="language_id">
+      </select>
+      <input type="submit">
+    </form>
+  </body>
 </html>

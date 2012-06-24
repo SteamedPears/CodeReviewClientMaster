@@ -1,16 +1,16 @@
-.pre {
-    font: 10px/1.2 Courier, monospace;
-    white-space: pre;
-    width: 48em;
-    word-wrap: break-word;
+pre, code {
+    width: 50em;
+    margin-bottom: 0px;
+    padding: 0px 0px;
 }
 td.code {
+    font-size: 12px;
     width: 50em;
 }
 td.small {
     width: 1em;
 }
-table#code_table {
+#code_table {
     width: 100%;
 }
 span.button, div.button {
@@ -19,14 +19,29 @@ span.button, div.button {
     border: solid 1px black;
     padding: 2px;
 }
-input#user {
+#user {
     width: 20em;
 }
-textarea#text {
+#text {
     width: 100%;
     resize: none;
     height: 40em;
 }
-div#comment_box {
+#comment_box {
     padding: 2px;
+    position:absolute;
+	background:White;
+}
+
+.codeBlock{
+	background:White;
+}
+
+.highlighted{
+	background:LightSalmon;
+}
+
+#error {
+    background-color: Red;
+    color: White;
 }
