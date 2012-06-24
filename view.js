@@ -12,7 +12,9 @@
     comment_box_ob = null,
     num_lines = -1,
     comments = {},
-    codeMirror = null;
+    codeMirror = null,
+    noSelect = false;
+    
 
 /******************************************************************************
 * Utility Functions                                                           *
@@ -33,30 +35,6 @@ function reportError(text) {
 	$('#error').text(text).show();
 }
 
-    // http://www.quirksmode.org/dom/range_intro.html
-function getSelected() {
-	if(window.getSelection)
-	    return window.getSelection();
-	if(document.getSelection)
-	    return document.getSelection();
-	if(document.selection) // opera
-	    return document.selection.createRange();
-	logError("Couldn't get selected range");
-}
-    
-function getRangeObject(selectionObject) {
-	if (selectionObject.getRangeAt)
-	    return selectionObject.getRangeAt(0);
-	else { // Safari!
-	    var range = document.createRange();
-	    range.setStart(selectionObject.anchorNode,
-			   selectionObject.anchorOffset);
-	    range.setEnd(selectionObject.focusNode,
-			 selectionObject.focusOffset);
-	    return range;
-	}
-}
-
 function handleAjaxError(jqXHR, textStatus, errorThrown) {
 	reportError(errorThrown);
 }
@@ -66,37 +44,26 @@ function handleAjaxError(jqXHR, textStatus, errorThrown) {
 * Highlighting                                                                *
 ******************************************************************************/
 
-function highlightLines(start,end,highlighted) {
-	highlight_start = start;
-	highlight_end = end;
-	while(start <= end) {
-	    $('#line_pre' + start).toggleClass('highlighted',highlighted);
-	    $('#line' + start).toggleClass('highlighted',highlighted);
-	    ++start;
+function getSelection(codeMirror){
+	if(!noSelect){
+		if(codeMirror.somethingSelected){
+			var start = codeMirror.getCursor(true).line + 1;
+			var end = codeMirror.getCursor(false).line + 1;
+			console.log(start,end);
+			showCommentBox(start,end);
+		}else{
+			hideCommentBox();
+		}
 	}
 }
 
-function clearHighlighting() {
-	highlightLines(highlight_start,highlight_end,false);
-	highlight_start = -1;
-	highlight_end = -1;
-}
-
-function highlightComment(comment) {
-	clearHighlighting();
-	highlightLines(comment.line_start,
-		       comment.line_end,
-		       true);
-}
-
-function setSelection(codeMirror){
-	if(codeMirror.somethingSelected){
-		var start = codeMirror.getCursor(true).line + 1;
-		var end = codeMirror.getCursor(false).line + 1;
-		console.log(start,end);
-		showCommentBox(start,end);
-	}else{
-	}
+function setSelection(event){
+	var startLine = event.data.startLine-1;
+	var endLine = event.data.endLine;
+	console.log(startLine,endLine);
+	noSelect = true;
+	codeMirror.setSelection({line:startLine,ch:0},{line:endLine,ch:0});
+	noSelect = false;
 }
 
 /******************************************************************************
@@ -136,33 +103,18 @@ function getLanguage(id,success_fn,error_fn) {
 
 function showCommentBox(start,end) {
 	hideComments();
-	highlightLines(start,end,true);
 	selection_start = start;
 	selection_end = end;
 	$('input#line_start').val(start);
 	$('input#line_end').val(end);
+	$('#lineStartNum').text(start);
+	$('#lineEndNum').text(end);
 	var comment_box = $('#comment_box');
-	
-	/*var top = Number($('#line'+start).position().top);
-	comment_box.css('top',top);
-	var comment_ob = $('#comment1');
-	var left = comment_ob.position().left;
-	comment_box.css('left',left);
-	var width = comment_ob.css('width');
-	width = width.substring(0,width.indexOf('px'));
-	comment_box.css('width',width);
-	$('input#user').css('width',width);
-	var last_line_ob = $('#line'+num_lines);
-	var height = last_line_ob.css('height');
-	height = Number(height.substring(0,height.indexOf('px')));
-	height += Number(last_line_ob.position().top);
-	comment_box.css('height',height);*/
 	comment_box.slideDown();
 }
 
 function closeCommentBox() {
 	$('#comment_box').hide();
-	clearHighlighting();
 	selection_start = -1;
 	selection_end = -1;
 }
@@ -200,6 +152,7 @@ function buildCommentSet(lineNumber,commentSet) {
 	for(var i=0;i<commentSet.length;i++){
 		var comment = commentSet[i];
 		var commentDiv = $("<div class='commentBox'>");
+		commentDiv.mouseover({startLine:comment.line_start,endLine:comment.line_end},setSelection);
 		var title = $("<div class='commentTitle'>");
 		title.text(comment.user);
 		var body = $("<div class='commentBody'>");
@@ -208,40 +161,9 @@ function buildCommentSet(lineNumber,commentSet) {
 		commentDiv.append(body);
 		set.append(commentDiv);
 	}
-	//var top = Number($('#line'+n).position().top);
-	//set.css('top',top);
-	
 	
 	$("#commentsDiv").append(set);
 	set.hide();
-	/*var ob = $('<div>');
-	ob.addClass('window');
-	var text = comment.length + ""// comment";
-	/*if(comment.length > 1)
-	    text += "s";
-	ob.text(text);
-	ob.click(function() {
-	    openComment(n);
-	});
-	var comments = $('<div>');
-	*/
-	
-	/*
-	var left = $('#comment'+n).position().left;
-	comment_ob.css('left',left);
-	var width = $('#comment'+n).css('width');
-	comment_ob.css('width',width);
-	comment_ob.show();
-	
-	var name_ob = $('#user_name');
-	var comment_text_ob = $('#comment_text');
-	
-	for(comment in commentSet){
-		var commentDiv = $('<div>');
-	}
-	$('#comment'+n).append(ob);
-	*/
-	//$('#comment'+n).
 }
 
 function showComments(codeMirror, lineNumber){
@@ -274,7 +196,7 @@ function writeCodeLines(code) {
 			fixedGutter: true,
 			readOnly: true,
 			onGutterClick: showComments,
-			onCursorActivity: setSelection,
+			onCursorActivity: getSelection,
 			
 		});
 	},handleAjaxError);
@@ -300,28 +222,5 @@ $(document).ready(function() {
 	    return;
 	}
 	getCode(query.id,writeCodeLines,handleAjaxError);
-
-	// handle text selection
-	/*
-	$(document).mouseup(function() {
-	    var selected = getSelected();
-	    var range = getRangeObject(selected);
-	    var start_ob = $(range.startContainer.parentElement);
-	    var end_ob = $(range.endContainer.parentElement);
-	    var line_start = start_ob.data('line');
-	    var line_end = end_ob.data('line');
-	    if(line_start === undefined || line_end === undefined) {
-		start_ob = start_ob.parent().parent();
-		end_ob = end_ob.parent().parent();
-		line_start = start_ob.data('line');
-		line_end = end_ob.data('line');
-		if(line_start === undefined || line_end === undefined) {
-		    closeCommentBox();
-		    return;
-		}
-	    }
-	    showCommentBox(line_start,line_end);
-	});*/
-	$('#comment_form').mouseup(function() { return false; });
 });
 })();
