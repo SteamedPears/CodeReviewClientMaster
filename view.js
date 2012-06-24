@@ -89,6 +89,16 @@ function highlightComment(comment) {
 		       true);
 }
 
+function setSelection(codeMirror){
+	if(codeMirror.somethingSelected){
+		var start = codeMirror.getCursor(true).line + 1;
+		var end = codeMirror.getCursor(false).line + 1;
+		console.log(start,end);
+		showCommentBox(start,end);
+	}else{
+	}
+}
+
 /******************************************************************************
 * Data retrieval                                                              *
 ******************************************************************************/
@@ -125,7 +135,7 @@ function getLanguage(id,success_fn,error_fn) {
 ******************************************************************************/
 
 function showCommentBox(start,end) {
-	closeComments();
+	hideComments();
 	highlightLines(start,end,true);
 	selection_start = start;
 	selection_end = end;
@@ -133,7 +143,7 @@ function showCommentBox(start,end) {
 	$('input#line_end').val(end);
 	var comment_box = $('#comment_box');
 	
-	var top = Number($('#line'+start).position().top);
+	/*var top = Number($('#line'+start).position().top);
 	comment_box.css('top',top);
 	var comment_ob = $('#comment1');
 	var left = comment_ob.position().left;
@@ -146,8 +156,8 @@ function showCommentBox(start,end) {
 	var height = last_line_ob.css('height');
 	height = Number(height.substring(0,height.indexOf('px')));
 	height += Number(last_line_ob.position().top);
-	comment_box.css('height',height);
-	comment_box.show();
+	comment_box.css('height',height);*/
+	comment_box.slideDown();
 }
 
 function closeCommentBox() {
@@ -161,6 +171,13 @@ function closeCommentBox() {
 * Comment Display                                                             *
 ******************************************************************************/
 
+function writeComments(comments_ob) {
+	if((typeof comments_ob) === "string"){
+    	    comments_ob = jQuery.parseJSON(comments_ob);
+	}
+	buildCommentStructure(comments_ob);
+}
+
 function buildCommentStructure(comments_ob) {
 	var comments_list = comments_ob.comments;
 	for(var index in comments_list) {
@@ -171,72 +188,12 @@ function buildCommentStructure(comments_ob) {
 	    comments[line_start].push(comment);
 	}
 	for(var i in comments){
-		buildComment(Number(i)-1,comments[i]);
+		buildCommentSet(Number(i)-1,comments[i]);
 	}
 }
 
-function clearComments() {
-	for(var i in comments) {
-	    $('#comment'+i).text('');
-	}
-}
-
-function displayComment(text_ob,name_ob,comment_ob) {
-	name_ob.text(comment_ob.user);
-	text_ob.text('');
-	text_ob.append($('<span>').text(comment_ob.text));
-}
-
-function closeComments() {
-	clearComments();
-	clearHighlighting();
-	if(comment_ob === null)
-	    return;
-	comment_ob.hide()
-}
-
-function writeComments(comments_ob) {
-	if((typeof comments_ob) === "string"){
-    	    comments_ob = jQuery.parseJSON(comments_ob);
-	}
-	buildCommentStructure(comments_ob);
-	closeComments();
-}
-
-function openComment(n) {
-	clearComments();
-	var i = -1;
-	var num = comments[n].length;
-
-	// position comment window
-
-	
-	// previous button
-	var prev = $('#prev_button');
-	prev.click(function() {
-	    i = modulo(i-1,num);
-	    highlightComment(comments[n][i]);
-	    displayComment(comment_text_ob,name_ob,comments[n][i]);
-	});
-	
-	// next button
-	var next = $('#next_button');
-	next.click(function() {
-	    i = modulo(i+1,num);
-	    highlightComment(comments[n][i]);
-	    displayComment(comment_text_ob,name_ob,comments[n][i]);
-	});
-	next.click();
-
-	// close button
-	var close = $('#close_button');
-	close.click(function() {
-	    closeComments()
-	});
-}
-
-function buildComment(lineNumber,commentSet) {
-	console.log(lineNumber,commentSet.length,commentSet);
+function buildCommentSet(lineNumber,commentSet) {
+	//console.log(lineNumber,commentSet.length,commentSet);
 	codeMirror.setMarker(lineNumber, "<span class='commentNumber'>("+commentSet.length+")</span> %N%");
 	var set = $("<div class='commentSet'>");
 	set.attr("lineNumber",lineNumber);
@@ -251,6 +208,10 @@ function buildComment(lineNumber,commentSet) {
 		commentDiv.append(body);
 		set.append(commentDiv);
 	}
+	//var top = Number($('#line'+n).position().top);
+	//set.css('top',top);
+	
+	
 	$("#commentsDiv").append(set);
 	set.hide();
 	/*var ob = $('<div>');
@@ -263,8 +224,9 @@ function buildComment(lineNumber,commentSet) {
 	    openComment(n);
 	});
 	var comments = $('<div>');
-	var top = Number($('#line'+n).position().top);
-	comment_ob.css('top',top);
+	*/
+	
+	/*
 	var left = $('#comment'+n).position().left;
 	comment_ob.css('left',left);
 	var width = $('#comment'+n).css('width');
@@ -283,39 +245,19 @@ function buildComment(lineNumber,commentSet) {
 }
 
 function showComments(codeMirror, lineNumber){
-	$(".commentSet").hide();
+	closeCommentBox();
+	hideComments();
 	$(".commentSet[lineNumber='"+lineNumber+"']").slideDown();
+}
+
+function hideComments(){
+	$(".commentSet").hide();
 }
     
 /******************************************************************************
 * Code Display                                                                *
 ******************************************************************************/
     
-function buildCodeTable(n,line,language_code) {
-	var toPrint = $('<tr>');
-	var line_num = $('<td>');
-	line_num.text(n);
-	line_num.addClass('small');
-	toPrint.append(line_num);
-	var line_cell = $('<td>');
-	line_cell.addClass('code');
-	line_cell.data('line',n);
-	line_cell.attr('id','line_cell'+n);
-	toPrint.append(line_cell);
-	var line_pre = $('<pre class="codeBlock">');
-	line_pre.data('line',n);
-	line_pre.attr('id','line_pre'+n);
-	line_cell.append(line_pre);
-	var line_code = $('<code class="codeBlock">')
-	line_code.attr('id','line'+n);
-	line_code.text(line);
-	line_code.data('line',n);
-	line_code.attr('data-language',language_code);
-	line_pre.append(line_code);
-	toPrint.append($('<td>').attr('id','comment'+n));
-	$('#code_table').append(toPrint);
-}
-
 function writeCodeLines(code) {
 	if(code === null) return;
 	if((typeof code) === "string"){
@@ -332,24 +274,11 @@ function writeCodeLines(code) {
 			fixedGutter: true,
 			readOnly: true,
 			onGutterClick: showComments,
+			onCursorActivity: setSelection,
 			
 		});
 	},handleAjaxError);
 	getComments(code.id,writeComments,handleAjaxError);
-}
-
-function highlightSyntax(language) {
-	if(language === null ||
-	   language.code === undefined ||
-	   language.code === 'none')
-	    return;
-	// load the appropriate language script
-	var language_script = $('<script>');
-	language_script.attr('src',
-			     'include/rainbow/js/language/'+language.code+'.js');
-	$('head').append(language_script);
-	// call rainbow
-	Rainbow.color();
 }
     
 /******************************************************************************

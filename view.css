@@ -63,7 +63,7 @@ td.small {
     height: 40em;
 }
 #comment_box {
-    padding: 2px;
+	width:48%;
     position:absolute;
     background:White;
 }
