@@ -1,3 +1,7 @@
+/******************************************************************************
+* view.js                                                                     *
+* Copyright 2012, Alexis Beingessner and Simon Pratt                          *
+******************************************************************************/
 pre, code {
     width: 50em;
     margin-bottom: 0px;
@@ -30,11 +34,7 @@ span.button, div.button {
 #comment_box {
     padding: 2px;
     position:absolute;
-	background:White;
-}
-
-.codeBlock{
-	background:White;
+    background:White;
 }
 
 .highlighted{

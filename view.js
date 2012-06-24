@@ -1,7 +1,7 @@
 /******************************************************************************
- * view.js                                                                     *
- * Copyright 2012, Simon Pratt                                                 *
- ******************************************************************************/
+* view.js                                                                     *
+* Copyright 2012, Alexis Beingessner and Simon Pratt                          *
+******************************************************************************/
 (function() {
     var comments_div,
     highlight_start = -1,
@@ -60,20 +60,19 @@
 	reportError(errorThrown);
     }
 
+    
 /******************************************************************************
-* Highlighting
+* Highlighting                                                                *
 ******************************************************************************/
 
     function highlightLines(start,end,highlighted) {
-		highlight_start = start;
-		highlight_end = end;
-		console.log(highlighted);
-		while(start <= end) {
-			$('#line_pre' + start).toggleClass('highlighted',highlighted);
-			$('#line' + start).toggleClass('highlighted',highlighted);
-			console.log($('#line' + start).hasClass('highlighted'));
-			++start;
-		}
+	highlight_start = start;
+	highlight_end = end;
+	while(start <= end) {
+	    $('#line_pre' + start).toggleClass('highlighted',highlighted);
+	    $('#line' + start).toggleClass('highlighted',highlighted);
+	    ++start;
+	}
     }
 
     function clearHighlighting() {
@@ -131,7 +130,7 @@
 	selection_end = end;
 	$('input#line_start').val(start);
 	$('input#line_end').val(end);
-	var comment_box = $('div#comment_box');
+	var comment_box = $('#comment_box');
 	
 	var top = Number($('#line'+start).position().top);
 	comment_box.css('top',top);
@@ -151,7 +150,7 @@
     }
 
     function closeCommentBox() {
-	$('div#comment_box').hide();
+	$('#comment_box').hide();
 	clearHighlighting();
 	selection_start = -1;
 	selection_end = -1;
@@ -197,10 +196,11 @@
     }
 
     function writeComments(comments_ob) {
-    if((typeof comments_ob) == "string"){
-    	comments_ob = jQuery.parseJSON(comments_ob);
-    }
+	if((typeof comments_ob) === "string"){
+    	    comments_ob = jQuery.parseJSON(comments_ob);
+	}
 	buildCommentStructure(comments_ob);
+	logError('closing comments');
 	closeComments();
     }
 
@@ -310,8 +310,8 @@
 
     function writeCodeLines(code) {
 	if(code === null) return;
-	if((typeof code) == "string"){
-		code = jQuery.parseJSON(code);
+	if((typeof code) === "string"){
+	    code = jQuery.parseJSON(code);
 	}
 	var lines = code.text.split('\n');
 	num_lines = lines.length;
@@ -344,6 +344,7 @@
 ******************************************************************************/
 
     $(document).ready(function() {
+	$('#comment_box').hide();
 	// retrieve and display code
 	var query = URI(document.URL).query(true);
 	if(query.error != undefined) {
@@ -376,6 +377,5 @@
 	    showCommentBox(line_start,line_end);
 	});
 	$('#comment_form').mouseup(function() { return false; });
-	closeCommentBox();
     });
 })();
