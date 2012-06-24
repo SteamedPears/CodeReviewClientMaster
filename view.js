@@ -196,7 +196,7 @@
     }
 
     function writeComments(comments_ob) {
-	if((typeof comments_ob) == "string"){
+	if((typeof comments_ob) === "string"){
     	    comments_ob = jQuery.parseJSON(comments_ob);
 	}
 	buildCommentStructure(comments_ob);
@@ -310,7 +310,7 @@
 
     function writeCodeLines(code) {
 	if(code === null) return;
-	if((typeof code) == "string"){
+	if((typeof code) === "string"){
 	    code = jQuery.parseJSON(code);
 	}
 	var lines = code.text.split('\n');
