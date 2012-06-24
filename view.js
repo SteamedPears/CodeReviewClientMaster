@@ -323,6 +323,7 @@
 
     $(document).ready(function() {
 	comment_ob = $('#comment_window');
+	comment_ob.hide();
 	$('#comment_box').hide();
 	$('#error').hide();
 	// retrieve and display code
