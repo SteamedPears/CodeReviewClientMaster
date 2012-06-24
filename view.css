@@ -1,7 +1,7 @@
 /******************************************************************************
-* view.js                                                                     *
-* Copyright 2012, Alexis Beingessner and Simon Pratt                          *
-******************************************************************************/
+ * view.js                                                                     *
+ * Copyright 2012, Alexis Beingessner and Simon Pratt                          *
+ ******************************************************************************/
 pre, code {
     width: 50em;
     margin-bottom: 0px;
@@ -17,11 +17,33 @@ td.small {
 #code_table {
     width: 100%;
 }
-span.button, div.button {
-    cursor: default;
-    background: LightSalmon;
+#comment_window {
+    position: absolute;
+}
+#title_bar {
+    background-color: #ccc;
+}
+#comment_text {
+    margin: 3px;
+}
+.window {
     border: solid 1px black;
-    padding: 2px;
+    background-color: #f8f8f8;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.user_name {
+    font-size: 14px;
+    font-weight: bold;
+}
+.button {
+    cursor: default;
+    border: solid 1px black;
+    background-color: #f8f8f8;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
 }
 #user {
     width: 20em;
@@ -38,10 +60,31 @@ span.button, div.button {
 }
 
 .highlighted{
-	background:LightSalmon;
+    background:LightSalmon;
 }
 
 #error {
     background-color: Red;
     color: White;
+    border: solid 1px black;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
 }
+
+#prev_button, #next_button, #close_button {
+    width: 20px;
+}
+
+/*
+  left/right align in title bar
+  http://www.spartanicus.utvinternet.ie/left_and_right_alignment_using_css.htm
+*/
+
+div#title_bar{text-align:right;margin:0;padding:0}
+div#title_bar span{display:inline;white-space:nowrap}
+div#title_bar span.left{float:left}
+#comment_window>#title_bar{display:table;width:100%}
+#comment_window>#title_bar span{display:table-cell}
+#comment_window>#title_bar span.left{float:none;text-align:center}
+#comment_window>#title_bar span.right{text-align:center}

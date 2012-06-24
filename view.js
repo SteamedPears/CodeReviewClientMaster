@@ -8,7 +8,7 @@
     highlight_end = -1,
     selection_start = -1,
     selection_end = -1,
-    comment_text_ob = null,
+    comment_ob = null,
     comment_box_ob = null,
     num_lines = -1,
     comments = {};
@@ -29,7 +29,7 @@
 
     function reportError(text) {
 	logError(text);
-	$('#error').text(text);
+	$('#error').text(text).show();
     }
 
     // http://www.quirksmode.org/dom/range_intro.html
@@ -177,10 +177,10 @@
 	}
     }
 
-    function displayComment(dom_ob,comment_ob) {
-	dom_ob.text('');
-	dom_ob.append($('<h3>').text(comment_ob.user));
-	dom_ob.append($('<span>').text(comment_ob.text));
+    function displayComment(text_ob,name_ob,comment_ob) {
+	name_ob.text(comment_ob.user);
+	text_ob.text('');
+	text_ob.append($('<span>').text(comment_ob.text));
     }
 
     function closeComments() {
@@ -189,10 +189,9 @@
 	for(var i in comments) {
 	    writeComment(i,comments[i]);
 	}
-	if(comment_text_ob === null)
+	if(comment_ob === null)
 	    return;
-	comment_text_ob.remove()
-	comment_text_ob = null;
+	comment_ob.hide()
     }
 
     function writeComments(comments_ob) {
@@ -200,7 +199,6 @@
     	    comments_ob = jQuery.parseJSON(comments_ob);
 	}
 	buildCommentStructure(comments_ob);
-	logError('closing comments');
 	closeComments();
     }
 
@@ -208,67 +206,47 @@
 	clearComments();
 	var i = -1;
 	var num = comments[n].length;
-	var ob = $('<div>');
-	
-	// actual comment
-	comment_text_ob = $('<div>');
-	comment_text_ob.attr('id','selected_comment');
-	comment_text_ob.css('position','absolute');
-	
-	var top = Number($('#line'+n).position().top);
-	var height = $('#line'+n).css('height');
-	height = height.substring(0,height.indexOf('px'));
-	top += Number(height);
-	comment_text_ob.css('top',top);
-	var left = $('#comment'+n).position().left;
-	comment_text_ob.css('left',left);
-	comment_text_ob.appendTo($('body'));
 
-	// make the comment box bigger
-	var text_height = comment_text_ob.height();
-	comment_text_ob.css('height',text_height+300);
+	// position comment window
+
+	var top = Number($('#line'+n).position().top);
+	comment_ob.css('top',top);
+	var left = $('#comment'+n).position().left;
+	comment_ob.css('left',left);
+	var width = $('#comment'+n).css('width');
+	comment_ob.css('width',width);
+	comment_ob.show();
+	
+	var name_ob = $('#user_name');
+	var comment_text_ob = $('#comment_text');
 	
 	// previous button
-	var prev = $('<span>');
-	prev.attr('class','button');
-	prev.append('Previous');
+	var prev = $('#prev_button');
 	prev.click(function() {
 	    i = modulo(i-1,num);
 	    highlightComment(comments[n][i]);
-	    displayComment(comment_text_ob,comments[n][i]);
+	    displayComment(comment_text_ob,name_ob,comments[n][i]);
 	});
-	ob.append(prev);
-	ob.append(' ');
 	
 	// next button
-	var next = $('<span>');
-	next.attr('class','button');
-	next.append('Next');
+	var next = $('#next_button');
 	next.click(function() {
 	    i = modulo(i+1,num);
 	    highlightComment(comments[n][i]);
-	    displayComment(comment_text_ob,comments[n][i]);
+	    displayComment(comment_text_ob,name_ob,comments[n][i]);
 	});
 	next.click();
-	ob.append(next);
-	ob.append(' ');
 
 	// close button
-	var close = $('<span>');
-	close.attr('class','button');
-	close.append('X');
+	var close = $('#close_button');
 	close.click(function() {
 	    closeComments()
 	});
-	ob.append(close);
-	
-	// add all to document
-	$('#comment'+n).append(ob);
     }
 
     function writeComment(n,comment) {
 	var ob = $('<div>');
-	ob.attr('class','button');
+	ob.addClass('window');
 	var text = comment.length + " comment";
 	if(comment.length > 1)
 	    text += "s";
@@ -344,7 +322,9 @@
 ******************************************************************************/
 
     $(document).ready(function() {
+	comment_ob = $('#comment_window');
 	$('#comment_box').hide();
+	$('#error').hide();
 	// retrieve and display code
 	var query = URI(document.URL).query(true);
 	if(query.error != undefined) {
