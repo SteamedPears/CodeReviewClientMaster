@@ -4,7 +4,7 @@
 ******************************************************************************/
 (function() {
     function reportError(errorText) {
-	$('#error').text(errorText);
+	$('#error').text(errorText).show();
     }
     
     function buildLanguageSelect(jqo, data) {
@@ -27,6 +27,7 @@
 * Run when display ready                                                      *
 ******************************************************************************/
     $(document).ready(function() {
+	$('#error').hide();
 	// display error message, if any
 	var query = URI(document.URL).query(true);
 	if(query.error != undefined) {
