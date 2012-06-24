@@ -10,7 +10,7 @@ td.code {
 td.small {
     width: 1em;
 }
-table#code_table {
+#code_table {
     width: 100%;
 }
 span.button, div.button {
@@ -19,18 +19,29 @@ span.button, div.button {
     border: solid 1px black;
     padding: 2px;
 }
-input#user {
+#user {
     width: 20em;
 }
-textarea#text {
+#text {
     width: 100%;
     resize: none;
     height: 40em;
 }
-div#comment_box {
+#comment_box {
     padding: 2px;
+    position:absolute;
+	background:White;
 }
-div#error {
+
+.codeBlock{
+	background:White;
+}
+
+.highlighted{
+	background:LightSalmon;
+}
+
+#error {
     background-color: Red;
     color: White;
 }

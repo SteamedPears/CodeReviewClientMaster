@@ -8,8 +8,6 @@
     highlight_end = -1,
     selection_start = -1,
     selection_end = -1,
-    backgroundColour = 'White',
-    highlightColour = 'LightSalmon',
     comment_text_ob = null,
     comment_box_ob = null,
     num_lines = -1,
@@ -66,18 +64,20 @@
 * Highlighting
 ******************************************************************************/
 
-    function highlightLines(start,end,colour) {
-	highlight_start = start;
-	highlight_end = end;
-	while(start <= end) {
-	    $('#line_pre' + start).css('background',colour);
-	    $('#line' + start).css('background',colour);
-	    ++start;
-	}
+    function highlightLines(start,end,highlighted) {
+		highlight_start = start;
+		highlight_end = end;
+		console.log(highlighted);
+		while(start <= end) {
+			$('#line_pre' + start).toggleClass('highlighted',highlighted);
+			$('#line' + start).toggleClass('highlighted',highlighted);
+			console.log($('#line' + start).hasClass('highlighted'));
+			++start;
+		}
     }
 
     function clearHighlighting() {
-	highlightLines(highlight_start,highlight_end,'');
+	highlightLines(highlight_start,highlight_end,false);
 	highlight_start = -1;
 	highlight_end = -1;
     }
@@ -86,7 +86,7 @@
 	clearHighlighting();
 	highlightLines(comment.line_start,
 		       comment.line_end,
-		       highlightColour);
+		       true);
     }
 
 /******************************************************************************
@@ -126,14 +126,13 @@
 
     function showCommentBox(start,end) {
 	closeComments();
-	highlightLines(start,end,highlightColour);
+	highlightLines(start,end,true);
 	selection_start = start;
 	selection_end = end;
 	$('input#line_start').val(start);
 	$('input#line_end').val(end);
 	var comment_box = $('div#comment_box');
-	comment_box.css('position','absolute');
-	comment_box.css('background',backgroundColour);
+	
 	var top = Number($('#line'+start).position().top);
 	comment_box.css('top',top);
 	var comment_ob = $('#comment1');
@@ -198,6 +197,9 @@
     }
 
     function writeComments(comments_ob) {
+    if((typeof comments_ob) == "string"){
+    	comments_ob = jQuery.parseJSON(comments_ob);
+    }
 	buildCommentStructure(comments_ob);
 	closeComments();
     }
@@ -285,18 +287,18 @@
 	var toPrint = $('<tr>');
 	var line_num = $('<td>');
 	line_num.text(n);
-	line_num.attr('class','small');
+	line_num.addClass('small');
 	toPrint.append(line_num);
 	var line_cell = $('<td>');
-	line_cell.attr('class','code');
+	line_cell.addClass('code');
 	line_cell.data('line',n);
 	line_cell.attr('id','line_cell'+n);
 	toPrint.append(line_cell);
-	var line_pre = $('<pre>');
+	var line_pre = $('<pre class="codeBlock">');
 	line_pre.data('line',n);
 	line_pre.attr('id','line_pre'+n);
 	line_cell.append(line_pre);
-	var line_code = $('<code>')
+	var line_code = $('<code class="codeBlock">')
 	line_code.attr('id','line'+n);
 	line_code.text(line);
 	line_code.data('line',n);
@@ -308,6 +310,9 @@
 
     function writeCodeLines(code) {
 	if(code === null) return;
+	if((typeof code) == "string"){
+		code = jQuery.parseJSON(code);
+	}
 	var lines = code.text.split('\n');
 	num_lines = lines.length;
 	getLanguage(code.language_id,function(language) {
