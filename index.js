@@ -1,6 +1,9 @@
 /******************************************************************************
 * index.js                                                                    *
-* Copyright 2012, Simon Pratt                                                 *
+* Copyright 2012                                                              *
+* For details about the copyright holders, see the COPYRIGHT file.            *
+* This software is freely distributed under the ISC License.                  *
+* For details about the license, see the LICENSE file.                        *
 ******************************************************************************/
 (function() {
     function reportError(errorText) {
