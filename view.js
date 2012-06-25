@@ -49,7 +49,6 @@ function getSelection(codeMirror){
 		if(codeMirror.somethingSelected){
 			var start = codeMirror.getCursor(true).line + 1;
 			var end = codeMirror.getCursor(false).line + 1;
-			console.log(start,end);
 			showCommentBox(start,end);
 		}else{
 			hideCommentBox();
@@ -60,7 +59,6 @@ function getSelection(codeMirror){
 function setSelection(event){
 	var startLine = event.data.startLine-1;
 	var endLine = event.data.endLine;
-	console.log(startLine,endLine);
 	noSelect = true;
 	codeMirror.setSelection({line:startLine,ch:0},{line:endLine,ch:0});
 	noSelect = false;
@@ -188,18 +186,22 @@ function writeCodeLines(code) {
 	var lines = code.text.split('\n');
 	num_lines = lines.length;
 	$("#code").text(code.text);
-	
-	getLanguage(code.language_id,function(language) {
-		codeMirror = CodeMirror.fromTextArea(document.getElementById("code"),{
-			lineNumbers: true,
-			lineWrapping: true,
-			fixedGutter: true,
-			readOnly: true,
-			onGutterClick: showComments,
-			onCursorActivity: getSelection,
+	if(!codeMirror){
+		getLanguage(code.language_id,function(language) {
+			codeMirror = CodeMirror.fromTextArea(document.getElementById("code"),{
+				lineNumbers: true,
+				lineWrapping: true,
+				fixedGutter: true,
+				readOnly: true,
+				onGutterClick: showComments,
+				onCursorActivity: getSelection,
 			
-		});
-	},handleAjaxError);
+			});
+		},handleAjaxError);
+	}else{
+		comments = [];
+		$(".commentSet").remove();
+	}
 	getComments(code.id,writeComments,handleAjaxError);
 }
     
@@ -222,5 +224,9 @@ $(document).ready(function() {
 	    return;
 	}
 	getCode(query.id,writeCodeLines,handleAjaxError);
+	$('#comment_form').ajaxForm(function(){
+		getCode(query.id,writeCodeLines,handleAjaxError);
+		closeCommentBox();
+	}); 
 });
 })();
