@@ -1,4 +1,16 @@
 <html>
+  <head>
+    <script src="js/jquery-1.7.2.min.js"></script>
+    <script src="js/jquery.form.js"></script>
+    <script>
+      $(document).ready(function() {
+        $('#comment_form').ajaxForm(function() {
+          console.log('submitted');
+        });
+        console.log('ajaxed');
+      });
+    </script>
+  </head>
   <body>
     Code
     <form action="do/newcode" method="POST">

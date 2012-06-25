@@ -5,7 +5,7 @@
     <link href="include/rainbow/themes/github.css" rel="stylesheet">
     <link rel="stylesheet" href="include/CodeMirror/lib/codemirror.css">
     <link href="view.css" rel="stylesheet">
-   
+    
     
     <!-- JS -->
     <script src="include/rainbow/js/rainbow.min.js"></script>
@@ -20,29 +20,20 @@
     <h1><a href="index.html">CodeReview</a></h1>
     <div id="error"></div>
     <div id="codeDiv">
-    	<textarea id="code"></textarea>
+      <textarea id="code"></textarea>
     </div>
     <div id="commentsDiv">
-		<div id="comment_box">
-		  <form id="comment_form" method="POST" action="do/newcomment">
-		    <input type="hidden" name="code_id" id="code_id" value="-1">
-		    <input type="hidden" name="line_start" id="line_start" value="-1">
-		    <input type="hidden" name="line_end" id="line_end" value="-1">
-		    <input id="user" type="text" name="user" value="Anonymous">
-		    Commenting on: <span id="lineStartNum">?</span>-<span id="lineEndNum">?</span><br/>
-		    <textarea id="text" name="text"></textarea><br>
-		    <input type="submit">
-		  </form>
-		</div>
-	</div>
-    <!--<div id="comment_window" class="window">
-      <div id="title_bar">
-        <span id="user_name" class="left user_name"></span>
-        <span id="prev_button" class="right button">&lt;</span>
-        <span id="next_button" class="right button">&gt;</span>
-        <span id="close_button" class="right button">X</span>
+      <div id="comment_box">
+	<form id="comment_form" method="POST" action="do/newcomment">
+	  <input type="hidden" name="code_id" id="code_id" value="-1">
+	  <input type="hidden" name="line_start" id="line_start" value="-1">
+	  <input type="hidden" name="line_end" id="line_end" value="-1">
+	  <input id="user" type="text" name="user" value="Anonymous">
+	  Commenting on: <span id="lineStartNum">?</span>-<span id="lineEndNum">?</span><br/>
+	  <textarea id="text" name="text"></textarea><br>
+	  <input type="submit">
+	</form>
       </div>
-      <div id="comment_text"></div>
-    </div>-->
+    </div>
   </body>
 </html>
