@@ -146,7 +146,6 @@
     }
 
     function buildCommentSet(lineNumber,commentSet) {
-	//console.log(lineNumber,commentSet.length,commentSet);
 	codeMirror.setMarker(lineNumber, "<span class='commentNumber'>("+commentSet.length+")</span> %N%");
 	var set = $("<div class='commentSet'>");
 	set.attr("lineNumber",lineNumber);
@@ -214,8 +213,6 @@
 ******************************************************************************/
 
     $(document).ready(function() {
-	//comment_ob = $('#comment_window');
-	//comment_ob.hide();
 	$('#comment_box').hide();
 	$('#error').hide();
 	// retrieve and display code
