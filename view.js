@@ -191,6 +191,11 @@
 	$("#code").text(code.text);
 	if(!codeMirror){
 	    getLanguage(code.language_id,function(language) {
+		var lang_name = language.code;
+		$('<script>')
+		    .attr('src',
+			  'include/CodeMirror/mode/'+lang_name+'/'+lang_name+'.js')
+		    .appendTo($('head'));
 		codeMirror = CodeMirror.fromTextArea(document.getElementById("code"),{
 		    lineNumbers: true,
 		    lineWrapping: true,
@@ -198,7 +203,7 @@
 		    readOnly: true,
 		    onGutterClick: showComments,
 		    onCursorActivity: getSelection,
-		    
+		    mode: lang_name
 		});
 	    },handleAjaxError);
 	}else{
