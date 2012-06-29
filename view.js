@@ -15,9 +15,9 @@
     comment_box_ob = null,
     num_lines = -1,
     comments = {},
+    language_data = null,
     codeMirror = null,
     noSelect = false;
-    
 
 /******************************************************************************
 * Utility Functions                                                           *
@@ -42,29 +42,33 @@
 	reportError(errorThrown);
     }
 
-    
-/******************************************************************************
-* Highlighting                                                                *
-******************************************************************************/
-
-    function getSelection(codeMirror){
-	if(!noSelect){
-	    if(codeMirror.somethingSelected){
-		var start = codeMirror.getCursor(true).line + 1;
-		var end = codeMirror.getCursor(false).line + 1;
-		showCommentBox(start,end);
-	    }else{
-		hideCommentBox();
-	    }
+    function include(filename) {
+	console.log('including ' + filename);
+	if(filename.indexOf('.js') != -1) {
+	    $('<script>').attr('src',filename).appendTo($('head'));
+	} else if(filename.indexOf('.css') != -1) {
+	    $('<link>')
+		.attr('rel','stylesheet')
+		.attr('href',filename)
+		.appendTo($('head'));
+	} else {
+	    logError('failed to include file: '+filename);
 	}
     }
 
-    function setSelection(event){
-	var startLine = event.data.startLine-1;
-	var endLine = event.data.endLine;
-	noSelect = true;
-	codeMirror.setSelection({line:startLine,ch:0},{line:endLine,ch:0});
-	noSelect = false;
+    function resolveRequirements(languages,language,requirements,req_list){
+	var lang = languages[language];
+	var requires = lang.requires;
+	if(requires){
+	    for(var requirement in requires){
+		var name = requires[requirement];
+		if(!requirements[name]){
+		    requirements[name] = true;
+		    resolveRequirements(languages,name,requirements,req_list);
+		    req_list.push(name);
+		}
+	    }
+	}
     }
 
 /******************************************************************************
@@ -96,6 +100,38 @@
 	    error:    error_fn,
 	    success:  success_fn
 	});
+    }
+
+    function getLanguageData(success_fn,error_fn) {
+	$.ajax('languages.json',{
+	    dataType: 'json',
+	    error:    error_fn,
+	    success:  success_fn
+	});
+    }
+    
+/******************************************************************************
+* Highlighting                                                                *
+******************************************************************************/
+
+    function getSelection(codeMirror){
+	if(!noSelect){
+	    if(codeMirror.somethingSelected){
+		var start = codeMirror.getCursor(true).line + 1;
+		var end = codeMirror.getCursor(false).line + 1;
+		showCommentBox(start,end);
+	    }else{
+		hideCommentBox();
+	    }
+	}
+    }
+
+    function setSelection(event){
+	var startLine = event.data.startLine-1;
+	var endLine = event.data.endLine;
+	noSelect = true;
+	codeMirror.setSelection({line:startLine,ch:0},{line:endLine,ch:0});
+	noSelect = false;
     }
 
 /******************************************************************************
@@ -146,7 +182,13 @@
     }
 
     function buildCommentSet(lineNumber,commentSet) {
-	codeMirror.setMarker(lineNumber, "<span class='commentNumber'>("+commentSet.length+")</span> %N%");
+	if(codeMirror == null) {
+	    logError('Tried to build comment set while code mirror null');
+	    return;
+	}
+	codeMirror.setMarker(lineNumber,
+			     "<span class='commentNumber'>("+
+			     commentSet.length+")</span> %N%");
 	var set = $("<div class='commentSet'>");
 	set.attr("lineNumber",lineNumber);
 	for(var i=0;i<commentSet.length;i++){
@@ -190,27 +232,44 @@
 	num_lines = lines.length;
 	$("#code").text(code.text);
 	if(!codeMirror){
-	    getLanguage(code.language_id,function(language) {
-		var lang_name = language.code;
-		$('<script>')
-		    .attr('src',
-			  'include/CodeMirror/mode/'+lang_name+'/'+lang_name+'.js')
-		    .appendTo($('head'));
-		codeMirror = CodeMirror.fromTextArea(document.getElementById("code"),{
+	    getLanguage(code.language_id,function(language_ob) {
+		var language = language_data.data[language_ob.mode];
+		var req_ob = {};
+		var requirements = [];
+		resolveRequirements(language_data.data,
+				    language_ob.mode,
+				    req_ob,
+				    requirements);
+		if(req_ob[language_ob.mode] === undefined)
+		    requirements.push(language_ob.mode);
+		for(var index in requirements) {
+		    var lang = requirements[index];
+		    var file = language_data.data[lang].file;
+		    if(file !== undefined) {
+			include(language_data.include_path+file);
+		    }
+		}
+		var options = {
 		    lineNumbers: true,
 		    lineWrapping: true,
 		    fixedGutter: true,
 		    readOnly: true,
 		    onGutterClick: showComments,
 		    onCursorActivity: getSelection,
-		    mode: lang_name
-		});
+		    mode: language.mode
+		};
+		console.log(options.mode);
+		for(var index in language.options) {
+		    options[index] = language.options[index];
+		}
+		codeMirror = CodeMirror.fromTextArea(
+		    document.getElementById("code"),options);
+		getComments(code.id,writeComments,handleAjaxError);
 	    },handleAjaxError);
 	}else{
 	    comments = [];
 	    $(".commentSet").remove();
 	}
-	getComments(code.id,writeComments,handleAjaxError);
     }
     
 /******************************************************************************
@@ -229,10 +288,13 @@
 	    reportError("Code ID not found");
 	    return;
 	}
-	getCode(query.id,writeCodeLines,handleAjaxError);
 	$('#comment_form').ajaxForm(function(){
 	    getCode(query.id,writeCodeLines,handleAjaxError);
 	    closeCommentBox();
-	}); 
+	});
+	getLanguageData(function(language_ob) {
+	    language_data = language_ob;
+	    getCode(query.id,writeCodeLines,handleAjaxError);
+	},handleAjaxError);
     });
 })();
