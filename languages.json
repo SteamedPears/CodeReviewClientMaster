@@ -4,7 +4,7 @@
 	"none":{"mode":"text/plain",
 		"requires":[]},
 	"asp":{"mode":"application/x-aspx",
-	       "requires":["htmlmixed","htmlembedded"]},
+	       "requires":["htmlmixed","clike","htmlembedded"]},
 	"clike":{"file":"clike/clike.js"},
 	"c":{"mode":"text/x-csrc",
 	     "options":{"useCPP":true},
