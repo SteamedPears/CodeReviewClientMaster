@@ -110,7 +110,7 @@
 		"requires":["javascript"],
 		"options":{"json":true}},
 	"jsp":{"mode":"application/x-jsp",
-	       "requires":["htmlmixed","htmlembedded"]},
+	       "requires":["htmlmixed","clike","htmlembedded"]},
 	"latex":{"requires":["stex"]},
 	"less":{"file":"less/less.js",
 		"mode":"text/x-less"},

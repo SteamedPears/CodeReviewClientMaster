@@ -43,7 +43,6 @@
     }
 
     function include(filename) {
-	console.log('including ' + filename);
 	if(filename.indexOf('.js') != -1) {
 	    $('<script>').attr('src',filename).appendTo($('head'));
 	} else if(filename.indexOf('.css') != -1) {
@@ -258,7 +257,6 @@
 		    onCursorActivity: getSelection,
 		    mode: language.mode
 		};
-		console.log(options.mode);
 		for(var index in language.options) {
 		    options[index] = language.options[index];
 		}
