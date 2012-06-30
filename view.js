@@ -280,6 +280,7 @@
 		}
 		var options = {
 		    lineNumbers: true,
+		    lineWrapping: true,
 		    fixedGutter: true,
 		    readOnly: true,
 		    onGutterClick: showComments,
