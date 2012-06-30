@@ -20,7 +20,8 @@
     </div>
     <div id="commentsDiv">
       <div id="comment_box">
-	<form id="comment_form" method="POST" action="do/newcomment">
+	<form id="comment_form" enctype="multipart/form-data" 
+              method="POST" action="do/newcomment">
 	  <input type="hidden" name="code_id" id="code_id" value="-1">
 	  <input type="hidden" name="line_start" id="line_start" value="-1">
 	  <input type="hidden" name="line_end" id="line_end" value="-1">

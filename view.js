@@ -215,6 +215,10 @@
 			     "<span class='commentNumber'>("+
 			     commentSet.length+")</span> %N%");
 	var set = $("<div class='commentSet'>");
+	var coords = codeMirror.charCoords({line:lineNumber,char:0});
+	console.log('coords');
+	console.dir(coords);
+	set.css('top',coords.y);
 	set.attr("lineNumber",lineNumber);
 	for(var i=0;i<commentSet.length;i++){
 	    var comment = commentSet[i];
@@ -276,7 +280,6 @@
 		}
 		var options = {
 		    lineNumbers: true,
-		    lineWrapping: true,
 		    fixedGutter: true,
 		    readOnly: true,
 		    onGutterClick: showComments,

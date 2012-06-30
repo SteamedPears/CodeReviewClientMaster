@@ -1,17 +1,12 @@
 /******************************************************************************
- * view.js                                                                     *
- * Copyright 2012, Alexis Beingessner and Simon Pratt                          *
- ******************************************************************************/
-
-td.code {
-    font-size: 12px;
-    width: 50em;
-}
-td.small {
-    width: 1em;
-}
-#code_table {
-    width: 100%;
+* view.js                                                                     *
+* Copyright 2012, Alexis Beingessner and Simon Pratt                          *
+******************************************************************************/
+body {
+    min-width: 74em;
+    margin: 0;
+    margin-left: 2px;
+    padding: 0;
 }
 #comment_window {
     position: absolute;
@@ -45,13 +40,14 @@ td.small {
 }
 
 .commentTitle{
-	background-color: #ccc;
+    background-color: #ccc;
 }
 .commentBody{
-	margin: 3px;
+    margin: 3px;
 }
 .commentSet{
-	width:100%;
+    width:40%;
+    position: absolute;
 }
 
 #user {
@@ -63,13 +59,8 @@ td.small {
     height: 40em;
 }
 #comment_box {
-	width:48%;
+    width:40%;
     position:absolute;
-    background:White;
-}
-
-.highlighted{
-    background:LightSalmon;
 }
 
 #error {
@@ -81,48 +72,34 @@ td.small {
     border-radius: 3px;
 }
 
-#prev_button, #next_button, #close_button {
-    width: 20px;
-}
-
 #codeDiv{
-	width:50%;
-	height:100%;
-	float:right;
+    width:46em;
+    float:right;
 }
 
 #commentsDiv{
-	width:50%;
-	height:100%;
-	float:left;
+    width:40%;
+    height:100%;
+    float:left;
 }
 
 #code{
-	width:100%;
-	height:auto;
+    width:100%;
+    height:auto;
+    overflow:visible;
 }
-
+.CodeMirror-scroll {
+    height: auto;
+    overflow: visible;
+}
 .CodeMirror-gutter {
-	width: 5em;
-	background: white;
+    width: 5em;
+    background: white;
 }
 .CodeMirror {
-	border: 1px solid #aaa;
+    border: 1px solid #aaa;
 }
 
 .commentNumber{
-	float:left;
+    float:left;
 }
-
-/*
-  left/right align in title bar
-  http://www.spartanicus.utvinternet.ie/left_and_right_alignment_using_css.htm
-*/
-
-div#title_bar{text-align:right;margin:0;padding:0}
-div#title_bar span{display:inline;white-space:nowrap}
-div#title_bar span.left{float:left}
-#comment_window>#title_bar{display:table;width:100%}
-#comment_window>#title_bar span{display:table-cell}
-#comment_window>#title_bar span.left{float:none;text-align:center}
-#comment_window>#title_bar span.right{text-align:center}
