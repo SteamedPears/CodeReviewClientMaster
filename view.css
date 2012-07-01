@@ -1,105 +1,105 @@
 /******************************************************************************
-* view.js                                                                     *
+* view.css                                                                    *
 * Copyright 2012, Alexis Beingessner and Simon Pratt                          *
 ******************************************************************************/
 body {
-    min-width: 74em;
-    margin: 0;
-    margin-left: 2px;
-    padding: 0;
+	min-width: 74em;
+	margin: 0;
+	margin-left: 2px;
+	padding: 0;
 }
 #comment_window {
-    position: absolute;
+	position: absolute;
 }
 #title_bar {
-    background-color: #ccc;
+	background-color: #ccc;
 }
 #comment_text {
-    margin: 3px;
+	margin: 3px;
 }
 
 .user_name {
-    font-size: 14px;
-    font-weight: bold;
+	font-size: 14px;
+	font-weight: bold;
 }
 .button {
-    cursor: default;
-    border: solid 1px black;
-    background-color: #f8f8f8;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+	cursor: default;
+	border: solid 1px black;
+	background-color: #f8f8f8;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .commentBox {
-    border: solid 1px black;
-    background-color: #f8f8f8;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+	border: solid 1px black;
+	background-color: #f8f8f8;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .commentTitle{
-    background-color: #ccc;
+	background-color: #ccc;
 }
 .commentBody{
-    margin: 3px;
+	margin: 3px;
 }
 .commentSet{
-    width:40%;
-    position: absolute;
+	width:40%;
+	position: absolute;
 }
 
 #user {
-    width: 20em;
+	width: 20em;
 }
 #text {
-    width: 100%;
-    resize: none;
-    height: 40em;
+	width: 100%;
+	resize: none;
+	height: 40em;
 }
 #comment_box {
-    width:40%;
-    position:absolute;
+	width:40%;
+	position:absolute;
 }
 
 #error {
-    background-color: Red;
-    color: White;
-    border: solid 1px black;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+	background-color: Red;
+	color: White;
+	border: solid 1px black;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
 }
 
 #codeDiv{
-    width:46em;
-    float:right;
+	width:46em;
+	float:right;
 }
 
 #commentsDiv{
-    width:40%;
-    height:100%;
-    float:left;
+	width:40%;
+	height:100%;
+	float:left;
 }
 
 #code{
-    width:100%;
-    height:auto;
-    overflow:visible;
+	width:100%;
+	height:auto;
+	overflow:visible;
 }
 .CodeMirror-scroll {
-    height: auto;
-    overflow: visible;
+	height: auto;
+	overflow: visible;
 }
 .CodeMirror-gutter {
-    width: 5em;
-    background: white;
+	width: 5em;
+	background: white;
 }
 .CodeMirror {
-    border: 1px solid #aaa;
+	border: 1px solid #aaa;
 }
 
 .commentNumber{
-    float:left;
+	float:left;
 }
