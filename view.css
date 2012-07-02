@@ -1,47 +1,42 @@
 /******************************************************************************
- * view.js                                                                     *
- * Copyright 2012, Alexis Beingessner and Simon Pratt                          *
- ******************************************************************************/
-
-td.code {
-    font-size: 12px;
-    width: 50em;
-}
-td.small {
-    width: 1em;
-}
-#code_table {
-    width: 100%;
+* view.css                                                                    *
+* Copyright 2012, Alexis Beingessner and Simon Pratt                          *
+******************************************************************************/
+body {
+	min-width: 74em;
+	margin: 0;
+	margin-left: 2px;
+	padding: 0;
 }
 #comment_window {
-    position: absolute;
+	position: absolute;
 }
 #title_bar {
-    background-color: #ccc;
+	background-color: #ccc;
 }
 #comment_text {
-    margin: 3px;
+	margin: 3px;
 }
 
 .user_name {
-    font-size: 14px;
-    font-weight: bold;
+	font-size: 14px;
+	font-weight: bold;
 }
 .button {
-    cursor: default;
-    border: solid 1px black;
-    background-color: #f8f8f8;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+	cursor: default;
+	border: solid 1px black;
+	background-color: #f8f8f8;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .commentBox {
-    border: solid 1px black;
-    background-color: #f8f8f8;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+	border: solid 1px black;
+	background-color: #f8f8f8;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .commentTitle{
@@ -51,48 +46,39 @@ td.small {
 	margin: 3px;
 }
 .commentSet{
-	width:100%;
+	width:40%;
+	position: absolute;
 }
 
 #user {
-    width: 20em;
+	width: 20em;
 }
 #text {
-    width: 100%;
-    resize: none;
-    height: 40em;
+	width: 100%;
+	resize: none;
+	height: 40em;
 }
 #comment_box {
-	width:48%;
-    position:absolute;
-    background:White;
-}
-
-.highlighted{
-    background:LightSalmon;
+	width:40%;
+	position:absolute;
 }
 
 #error {
-    background-color: Red;
-    color: White;
-    border: solid 1px black;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-}
-
-#prev_button, #next_button, #close_button {
-    width: 20px;
+	background-color: Red;
+	color: White;
+	border: solid 1px black;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
 }
 
 #codeDiv{
-	width:50%;
-	height:100%;
+	width:46em;
 	float:right;
 }
 
 #commentsDiv{
-	width:50%;
+	width:40%;
 	height:100%;
 	float:left;
 }
@@ -100,8 +86,12 @@ td.small {
 #code{
 	width:100%;
 	height:auto;
+	overflow:visible;
 }
-
+.CodeMirror-scroll {
+	height: auto;
+	overflow: visible;
+}
 .CodeMirror-gutter {
 	width: 5em;
 	background: white;
@@ -113,16 +103,3 @@ td.small {
 .commentNumber{
 	float:left;
 }
-
-/*
-  left/right align in title bar
-  http://www.spartanicus.utvinternet.ie/left_and_right_alignment_using_css.htm
-*/
-
-div#title_bar{text-align:right;margin:0;padding:0}
-div#title_bar span{display:inline;white-space:nowrap}
-div#title_bar span.left{float:left}
-#comment_window>#title_bar{display:table;width:100%}
-#comment_window>#title_bar span{display:table-cell}
-#comment_window>#title_bar span.left{float:none;text-align:center}
-#comment_window>#title_bar span.right{text-align:center}
