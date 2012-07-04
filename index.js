@@ -42,5 +42,10 @@
 		$.get('/do/languages',function(data) {
 			buildLanguageSelect($('#language_id'),data);
 		});
+		CodeMirror.fromTextArea(document.getElementById("code"),{
+			lineNumbers: true,
+			lineWrapping: true,
+			fixedGutter: true
+		});
 	});
 })();
