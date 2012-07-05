@@ -297,6 +297,7 @@
 		}else{
 			comments = [];
 			$(".commentSet").remove();
+			getComments(code.id,writeComments,handleAjaxError);
 		}
 	}
 
@@ -323,9 +324,12 @@
 			reportError("Code ID not found");
 			return;
 		}
-		$('#comment_form').ajaxForm(function(){
-			getCode(query.id,writeCodeLines,handleAjaxError);
-			closeCommentBox();
+		$('#comment_form').ajaxForm({
+			success:function(){
+				getCode(query.id,writeCodeLines,handleAjaxError);
+				closeCommentBox();
+			},
+			error:handleAjaxError
 		});
 		getLanguageData(function(language_ob) {
 			language_data = language_ob;
