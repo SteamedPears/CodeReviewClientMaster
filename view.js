@@ -327,6 +327,7 @@
 		$('#comment_form').ajaxForm({
 			success:function(){
 				getCode(query.id,writeCodeLines,handleAjaxError);
+				$('#text').val('');
 				closeCommentBox();
 			},
 			error:handleAjaxError
