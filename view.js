@@ -344,13 +344,13 @@
 					mode: language.mode,
 					onGutterClick: showComments,
 					onCursorActivity: getSelection,
-					
 				};
 				diffOptions = {
 					lineNumbers: true,
 					lineWrapping: true,
 					fixedGutter: true,
 					readOnly: false,
+					smartIndent:false,
 					mode: language.mode,
 				};
 				commentOptions = {
