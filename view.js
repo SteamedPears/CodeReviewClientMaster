@@ -263,7 +263,7 @@
 				}
 				diffs.text(str);
 				
-				var mirror = CodeMirror.fromTextArea(diffs.get(0),diffOptions);
+				var mirror = CodeMirror.fromTextArea(diffs.get(0),commentOptions);
 				
 				var curIndex = 0;
 				var curPos = mirror.posFromIndex(curIndex);
