@@ -22,7 +22,8 @@
 	codeOptions = null,
 	diffOptions = null,
 	commentOptions = null,
-	commentMirrors = [];
+	commentMirrors = [],
+	diffComputer = new diff_match_patch();
 
 /******************************************************************************
 * Utility Functions                                                           *
@@ -249,12 +250,37 @@
 			
 			if(comment.diffs){
 				var diffs = $("<textarea class='commentDiffs'>");
-				diffs.text(comment.diffs);
 				commentDiv.append(diffs);
+				var original = codeMirror.getRange(
+					{line:comment.line_start-1,ch:0},
+					{line:comment.line_end,ch:0});
+				var rawDiffs = diffComputer.diff_main(original,comment.diffs);
+				diffComputer.diff_cleanupSemantic(rawDiffs);
+				
+				var str = "";
+				for(index in rawDiffs){
+					str+=rawDiffs[index][1];
+				}
+				diffs.text(str);
+				
 				var mirror = CodeMirror.fromTextArea(diffs.get(0),diffOptions);
+				
+				var curIndex = 0;
+				var curPos = mirror.posFromIndex(curIndex);
+				for(index in rawDiffs){
+					var diff = rawDiffs[index];
+					var type = diff[0];
+					var text = diff[1];
+					
+					var newIndex = curIndex+text.length;
+					var newPos = mirror.posFromIndex(newIndex);
+					mirror.markText(curPos,newPos,"diffStyle_"+type);
+					curIndex = newIndex;
+					curPos = newPos;
+				}
+				
 				mirror.setOption("firstLineNumber",lineNumber+1);
 				commentMirrors[lineNumber].push(mirror);
-				
 			}
 			
 		}
