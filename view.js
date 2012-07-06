@@ -251,7 +251,9 @@
 				var diffs = $("<textarea class='commentDiffs'>");
 				diffs.text(comment.diffs);
 				commentDiv.append(diffs);
-				commentMirrors[lineNumber].push(CodeMirror.fromTextArea(diffs.get(0),diffOptions));
+				var mirror = CodeMirror.fromTextArea(diffs.get(0),diffOptions);
+				mirror.setOption("firstLineNumber",lineNumber+1);
+				commentMirrors[lineNumber].push(mirror);
 				
 			}
 			
