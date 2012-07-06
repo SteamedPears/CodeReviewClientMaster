@@ -49,6 +49,11 @@ body {
 	width:40%;
 	position: absolute;
 }
+.commentDiffs{
+	width:100%;
+	height:auto;
+	overflow:visible;
+}
 
 #user {
 	width: 20em;
@@ -56,7 +61,7 @@ body {
 #text {
 	width: 100%;
 	resize: none;
-	height: 40em;
+	height: 20em;
 }
 #comment_box {
 	width:40%;
@@ -88,6 +93,7 @@ body {
 	height:auto;
 	overflow:visible;
 }
+
 .CodeMirror-scroll {
 	height: auto;
 	overflow: visible;

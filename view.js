@@ -17,7 +17,12 @@
 	comments = {},
 	language_data = null,
 	codeMirror = null,
-	noSelect = false;
+	diffMirror = null,
+	noSelect = false,
+	codeOptions = null,
+	diffOptions = null,
+	commentOptions = null,
+	commentMirrors = [];
 
 /******************************************************************************
 * Utility Functions                                                           *
@@ -144,6 +149,7 @@
 			if(codeMirror.somethingSelected){
 				var start = codeMirror.getCursor(true).line + 1;
 				var end = codeMirror.getCursor(false).line + 1;
+				hideComments();
 				showCommentBox(start,end);
 			}else{
 				hideCommentBox();
@@ -164,14 +170,19 @@
 ******************************************************************************/
 
 	function showCommentBox(start,end) {
-		hideComments();
 		selection_start = start;
 		selection_end = end;
 		$('input#line_start').val(start);
 		$('input#line_end').val(end);
 		$('#lineStartNum').text(start);
 		$('#lineEndNum').text(end);
+		diffMirror.setOption("firstLineNumber",start);
+		diffMirror.setValue(codeMirror.getRange(
+			{line:start-1,ch:0},
+			{line:end-1,ch:999999}));
 		var comment_box = $('#comment_box');
+		var coords = codeMirror.charCoords({line:start-1,char:0});
+		comment_box.css('top',coords.y);
 		comment_box.slideDown();
 	}
 
@@ -190,6 +201,7 @@
 			comments_ob = jQuery.parseJSON(comments_ob);
 		}
 		buildCommentStructure(comments_ob);
+		codeMirror.refresh();
 	}
 
 	function buildCommentStructure(comments_ob) {
@@ -211,13 +223,14 @@
 			logError('Tried to build comment set while code mirror null');
 			return;
 		}
+		commentMirrors[lineNumber] = [];
 		codeMirror.setMarker(lineNumber,
 							 "<span class='commentNumber'>("+
 							 commentSet.length+")</span> %N%");
 		var set = $("<div class='commentSet'>");
 		var coords = codeMirror.charCoords({line:lineNumber,char:0});
-		console.log('coords');
-		console.dir(coords);
+		//console.log('coords');
+		//console.dir(coords);
 		set.css('top',coords.y);
 		set.attr("lineNumber",lineNumber);
 		for(var i=0;i<commentSet.length;i++){
@@ -228,9 +241,22 @@
 			title.text(comment.user);
 			var body = $("<div class='commentBody'>");
 			body.text(comment.text);
+			
 			commentDiv.append(title);
 			commentDiv.append(body);
+			
 			set.append(commentDiv);
+			
+			if(comment.diffs){
+				var diffs = $("<textarea class='commentDiffs'>");
+				diffs.text(comment.diffs);
+				commentDiv.append(diffs);
+				var mirror = CodeMirror.fromTextArea(diffs.get(0),diffOptions);
+				mirror.setOption("firstLineNumber",lineNumber+1);
+				commentMirrors[lineNumber].push(mirror);
+				
+			}
+			
 		}
 
 		$("#commentsDiv").append(set);
@@ -241,6 +267,10 @@
 		closeCommentBox();
 		hideComments();
 		$(".commentSet[lineNumber='"+lineNumber+"']").slideDown();
+		var mirrors = commentMirrors[lineNumber];
+		for(index in mirrors){
+			mirrors[index].refresh();
+		}
 	}
 
 	function hideComments(){
@@ -278,20 +308,44 @@
 						include(language_data.include_path+file);
 					}
 				}
-				var options = {
+				
+				//codeOptions, diffOptions, commentOptions are globals
+				codeOptions = {
 					lineNumbers: true,
 					lineWrapping: true,
 					fixedGutter: true,
 					readOnly: true,
+					mode: language.mode,
 					onGutterClick: showComments,
 					onCursorActivity: getSelection,
-					mode: language.mode
+					
 				};
+				diffOptions = {
+					lineNumbers: true,
+					lineWrapping: true,
+					fixedGutter: true,
+					readOnly: false,
+					mode: language.mode,
+				};
+				commentOptions = {
+					lineNumbers: true,
+					lineWrapping: true,
+					fixedGutter: true,
+					readOnly: true,
+					mode: language.mode,
+				};
+				
 				for(var index in language.options) {
-					options[index] = language.options[index];
+					diffOptions[index] = 
+						codeOptions[index] = 
+						commentOptions[index] = language.options[index];
 				}
+				
 				codeMirror = CodeMirror.fromTextArea(
-					document.getElementById("code"),options);
+					document.getElementById("code"),codeOptions);
+				diffMirror = CodeMirror.fromTextArea(
+					document.getElementById("diffs"),diffOptions);
+				
 				getComments(code.id,writeComments,handleAjaxError);
 			},handleAjaxError);
 		}else{
