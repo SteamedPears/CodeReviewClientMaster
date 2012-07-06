@@ -379,6 +379,9 @@
 			return;
 		}
 		$('#comment_form').ajaxForm({
+			beforeSerialize: function() {
+				diffMirror.save();
+			},
 			success:function(){
 				getCode(query.id,writeCodeLines,handleAjaxError);
 				$('#text').val('');
