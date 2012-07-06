@@ -263,7 +263,7 @@
 				}
 				diffs.text(str);
 				
-				var mirror = CodeMirror.fromTextArea(diffs.get(0),diffOptions);
+				var mirror = CodeMirror.fromTextArea(diffs.get(0),commentOptions);
 				
 				var curIndex = 0;
 				var curPos = mirror.posFromIndex(curIndex);
@@ -344,13 +344,13 @@
 					mode: language.mode,
 					onGutterClick: showComments,
 					onCursorActivity: getSelection,
-					
 				};
 				diffOptions = {
 					lineNumbers: true,
 					lineWrapping: true,
 					fixedGutter: true,
 					readOnly: false,
+					smartIndent:false,
 					mode: language.mode,
 				};
 				commentOptions = {
