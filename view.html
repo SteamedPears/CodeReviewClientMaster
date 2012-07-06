@@ -17,20 +17,25 @@
 		<div id="codeDiv">
 			<textarea id="code"></textarea>
 		</div>
-		<div id="commentsDiv">
+		<div>
+			<div id="commentsDiv">
+				
+			</div>
 			<div id="comment_box">
-			<form id="comment_form" enctype="multipart/form-data" 
+				<form id="comment_form" enctype="multipart/form-data" 
 				  method="POST" action="do/newcomment">
-				<input type="hidden" name="code_id" id="code_id" value="-1">
-				<input type="hidden" name="line_start" id="line_start" value="-1">
-				<input type="hidden" name="line_end" id="line_end" value="-1">
-				<input id="user" type="text" name="user" value="Anonymous">
-				Commenting on: 
-				<span id="lineStartNum">?</span>-<span id="lineEndNum">?</span><br/>
-				<textarea id="text" name="text"></textarea><br>
-				<input type="submit">
-			</form>
-		  </div>
+					<input type="hidden" name="code_id" id="code_id" value="-1">
+					<input type="hidden" name="line_start" id="line_start" value="-1">
+					<input type="hidden" name="line_end" id="line_end" value="-1">
+					<input id="user" type="text" name="user" value="Anonymous">
+					Commenting on: 
+					<span id="lineStartNum">?</span>-<span id="lineEndNum">?</span><br/>
+					<textarea id="text" name="text"></textarea></br>
+					<textarea id="diffs" name="diffs"></textarea></br>
+					<input type="submit">
+				</form>
+		  	</div>
+		
 		</div>
 	</body>
 </html>
