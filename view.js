@@ -255,7 +255,6 @@
 				var from = {line:comment.line_start-1,ch:0};
 				var to = {line:comment.line_end-1,ch:999999};
 				var original = codeMirror.getRange(from,to);
-				console.log(diffComputer);
 				var rawDiffs = diffComputer.diff_main(original,comment.diffs);
 				diffComputer.diff_cleanupSemantic(rawDiffs);
 				rawDiffs.from = from;
@@ -276,14 +275,16 @@
 				
 					var curIndex = 0;
 					var curPos = mirror.posFromIndex(curIndex);
-					console.log(rawDiffs);
 					for(var index = 0; index<rawDiffs.length; index++){
 						var diff = rawDiffs[index];
 						var type = diff[0];
 						var text = diff[1];
-						console.log(text);
 						var newIndex = curIndex+text.length;
 						var newPos = mirror.posFromIndex(newIndex);
+						if(newPos.ch==0){
+							newPos.line--;
+							newPos.ch=999999;
+						}
 						mirror.markText(curPos,newPos,"diffStyle_"+type);
 						curIndex = newIndex;
 						curPos = newPos;
@@ -332,7 +333,9 @@
 			mergeMirror = CodeMirror.fromTextArea(area.get(0),codeOptions);
 		}
 		mergeMirror.setValue(codeMirror.getValue());
-		
+		appliedDiffs.sort(function(a,b){
+			return b.from.line-a.from.line;
+		});
 		for(var i in appliedDiffs){
 			var diffSet = appliedDiffs[i];
 			var result = "";
