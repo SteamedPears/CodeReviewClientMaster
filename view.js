@@ -24,7 +24,7 @@
 	diffOptions = null,
 	commentOptions = null,
 	commentMirrors = [],
-	diffComputer = new diff_match_patch().
+	diffComputer = new diff_match_patch(),
 	appliedDiffs = [];
 
 /******************************************************************************
@@ -252,16 +252,17 @@
 			
 			if(comment.diffs){
 				var diffs = $("<textarea class='commentDiffs'>");
-				
-				var original = codeMirror.getRange(
-					{line:comment.line_start-1,ch:0},
-					{line:comment.line_end,ch:0});
+				var from = {line:comment.line_start-1,ch:0};
+				var to = {line:comment.line_end-1,ch:999999};
+				var original = codeMirror.getRange(from,to);
+				console.log(diffComputer);
 				var rawDiffs = diffComputer.diff_main(original,comment.diffs);
 				diffComputer.diff_cleanupSemantic(rawDiffs);
-				
+				rawDiffs.from = from;
+				rawDiffs.to = to;
 				var str = "";
 				var hasDiffs = false;
-				for(var index in rawDiffs){
+				for(var index = 0; index<rawDiffs.length; index++){
 					var diff = rawDiffs[index];
 					str+=diff[1];
 					hasDiffs = hasDiffs || diff[0];
@@ -275,29 +276,31 @@
 				
 					var curIndex = 0;
 					var curPos = mirror.posFromIndex(curIndex);
-					for(index in rawDiffs){
+					console.log(rawDiffs);
+					for(var index = 0; index<rawDiffs.length; index++){
 						var diff = rawDiffs[index];
 						var type = diff[0];
 						var text = diff[1];
-					
+						console.log(text);
 						var newIndex = curIndex+text.length;
 						var newPos = mirror.posFromIndex(newIndex);
 						mirror.markText(curPos,newPos,"diffStyle_"+type);
 						curIndex = newIndex;
 						curPos = newPos;
 					}
-				
+					
 					mirror.setOption("firstLineNumber",lineNumber+1);
 					commentMirrors[lineNumber].push(mirror);
 					var useIt = $("<input type='checkbox'>");
 					useIt.click(function(){
-						if($(this).checked()){
+						if($(this).is(":checked")){
 							appliedDiffs.push(rawDiffs);	
 						}else{
-							appliedDiffs.remove(appliedDiffs.indexOf(rawDiffs));
+							appliedDiffs.splice(
+								appliedDiffs.indexOf(rawDiffs),1);
 						}
 					})
-					commentDiv.append($("Use this diff"));
+					commentDiv.append($("<label>Use this diff</label>"));
 					commentDiv.append(useIt);
 				}
 			}
@@ -328,10 +331,22 @@
 			$("#codeDiv").append(area);
 			mergeMirror = CodeMirror.fromTextArea(area.get(0),codeOptions);
 		}
-		for(var index in appliedDiffs){
-			var diffSet = appliedDiffs[index];
-			
+		mergeMirror.setValue(codeMirror.getValue());
+		
+		for(var i in appliedDiffs){
+			var diffSet = appliedDiffs[i];
+			var result = "";
+			for(var j=0; j<diffSet.length; j++){
+				var diff = diffSet[j];
+				var type = diff[0];
+				var text = diff[1];
+				if(type!=-1){
+					result+=text;
+				}
+			}
+			mergeMirror.replaceRange(result,diffSet.from,diffSet.to);
 		}
+		mergeMirror.refresh();
 	}
 
 /******************************************************************************
@@ -446,6 +461,8 @@
 			},
 			error:handleAjaxError
 		});
+		$('#codeDiv').append(
+			$('<button type="button">Merge Diffs</input>').click(merge));
 		getLanguageData(function(language_ob) {
 			language_data = language_ob;
 			getCode(query.id,writeCodeLines,handleAjaxError);
