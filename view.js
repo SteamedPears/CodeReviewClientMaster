@@ -18,12 +18,14 @@
 	language_data = null,
 	codeMirror = null,
 	diffMirror = null,
+	mergeMirror = null,
 	noSelect = false,
 	codeOptions = null,
 	diffOptions = null,
 	commentOptions = null,
 	commentMirrors = [],
-	diffComputer = new diff_match_patch();
+	diffComputer = new diff_match_patch(),
+	appliedDiffs = [];
 
 /******************************************************************************
 * Utility Functions                                                           *
@@ -250,37 +252,57 @@
 			
 			if(comment.diffs){
 				var diffs = $("<textarea class='commentDiffs'>");
-				commentDiv.append(diffs);
-				var original = codeMirror.getRange(
-					{line:comment.line_start-1,ch:0},
-					{line:comment.line_end,ch:0});
+				var from = {line:comment.line_start-1,ch:0};
+				var to = {line:comment.line_end-1,ch:999999};
+				var original = codeMirror.getRange(from,to);
+				console.log(diffComputer);
 				var rawDiffs = diffComputer.diff_main(original,comment.diffs);
 				diffComputer.diff_cleanupSemantic(rawDiffs);
-				
+				rawDiffs.from = from;
+				rawDiffs.to = to;
 				var str = "";
-				for(index in rawDiffs){
-					str+=rawDiffs[index][1];
-				}
-				diffs.text(str);
-				
-				var mirror = CodeMirror.fromTextArea(diffs.get(0),commentOptions);
-				
-				var curIndex = 0;
-				var curPos = mirror.posFromIndex(curIndex);
-				for(index in rawDiffs){
+				var hasDiffs = false;
+				for(var index = 0; index<rawDiffs.length; index++){
 					var diff = rawDiffs[index];
-					var type = diff[0];
-					var text = diff[1];
-					
-					var newIndex = curIndex+text.length;
-					var newPos = mirror.posFromIndex(newIndex);
-					mirror.markText(curPos,newPos,"diffStyle_"+type);
-					curIndex = newIndex;
-					curPos = newPos;
+					str+=diff[1];
+					hasDiffs = hasDiffs || diff[0];
 				}
+				if(hasDiffs){
+					commentDiv.append(diffs);
+					diffs.text(str);
 				
-				mirror.setOption("firstLineNumber",lineNumber+1);
-				commentMirrors[lineNumber].push(mirror);
+					var mirror = CodeMirror.fromTextArea(
+						diffs.get(0),commentOptions);
+				
+					var curIndex = 0;
+					var curPos = mirror.posFromIndex(curIndex);
+					console.log(rawDiffs);
+					for(var index = 0; index<rawDiffs.length; index++){
+						var diff = rawDiffs[index];
+						var type = diff[0];
+						var text = diff[1];
+						console.log(text);
+						var newIndex = curIndex+text.length;
+						var newPos = mirror.posFromIndex(newIndex);
+						mirror.markText(curPos,newPos,"diffStyle_"+type);
+						curIndex = newIndex;
+						curPos = newPos;
+					}
+					
+					mirror.setOption("firstLineNumber",lineNumber+1);
+					commentMirrors[lineNumber].push(mirror);
+					var useIt = $("<input type='checkbox'>");
+					useIt.click(function(){
+						if($(this).is(":checked")){
+							appliedDiffs.push(rawDiffs);	
+						}else{
+							appliedDiffs.splice(
+								appliedDiffs.indexOf(rawDiffs),1);
+						}
+					})
+					commentDiv.append($("<label>Use this diff</label>"));
+					commentDiv.append(useIt);
+				}
 			}
 			
 		}
@@ -294,13 +316,37 @@
 		hideComments();
 		$(".commentSet[lineNumber='"+lineNumber+"']").slideDown();
 		var mirrors = commentMirrors[lineNumber];
-		for(index in mirrors){
+		for(var index in mirrors){
 			mirrors[index].refresh();
 		}
 	}
 
 	function hideComments(){
 		$(".commentSet").hide();
+	}
+	
+	function merge(){
+		if(!mergeMirror){
+			var area = $("<textarea>");
+			$("#codeDiv").append(area);
+			mergeMirror = CodeMirror.fromTextArea(area.get(0),codeOptions);
+		}
+		mergeMirror.setValue(codeMirror.getValue());
+		
+		for(var i in appliedDiffs){
+			var diffSet = appliedDiffs[i];
+			var result = "";
+			for(var j=0; j<diffSet.length; j++){
+				var diff = diffSet[j];
+				var type = diff[0];
+				var text = diff[1];
+				if(type!=-1){
+					result+=text;
+				}
+			}
+			mergeMirror.replaceRange(result,diffSet.from,diffSet.to);
+		}
+		mergeMirror.refresh();
 	}
 
 /******************************************************************************
@@ -415,6 +461,8 @@
 			},
 			error:handleAjaxError
 		});
+		$('#codeDiv').append(
+			$('<button type="button">Merge Diffs</input>').click(merge));
 		getLanguageData(function(language_ob) {
 			language_data = language_ob;
 			getCode(query.id,writeCodeLines,handleAjaxError);
