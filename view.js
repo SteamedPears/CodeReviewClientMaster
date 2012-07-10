@@ -5,7 +5,9 @@
 * This software is freely distributed under the ISC License.                  *
 * For details about the license, see the LICENSE file.                        *
 ******************************************************************************/
-(function() {
+
+var CodeReview = CodeReview || {};
+CodeReview = (function( CodeReview ) {
 	var comments_div,
 	highlight_start = -1,
 	highlight_end = -1,
@@ -26,6 +28,7 @@
 	commentMirrors = [],
 	diffComputer = new diff_match_patch(),
 	appliedDiffs = [];
+	CodeReview.codeMirror = undefined;
 
 /******************************************************************************
 * Utility Functions                                                           *
@@ -420,6 +423,9 @@
 					document.getElementById("code"),codeOptions);
 				diffMirror = CodeMirror.fromTextArea(
 					document.getElementById("diffs"),diffOptions);
+
+				// MINIMAP TIME
+				apply_minimap( codeMirror );
 				
 				getComments(code.id,writeComments,handleAjaxError);
 			},handleAjaxError);
@@ -471,4 +477,6 @@
 			getCode(query.id,writeCodeLines,handleAjaxError);
 		},handleAjaxError);
 	});
-})();
+	
+	return CodeReview;
+})( CodeReview );
