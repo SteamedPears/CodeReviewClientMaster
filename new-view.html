@@ -11,6 +11,7 @@
 		<script src="include/CodeMirror/lib/codemirror.js"></script>
 		<script src="js/jquery.form.js"></script>
 		<script src="js/jquery-ui-1.8.21.custom.min.js"></script>
+		<script src="new-view.js"></script>
 		<!--
 		<script src="include/minimap.js"></script>
 		<script src="view.js"></script>
@@ -21,44 +22,11 @@
 		<div id="error"></div>
 
 		<div id="code">
-			<p><textarea id="code-view"></textarea></p>
+			<textarea id="code-view"></textarea>
 		</div>
 
 		<div id="comment">
-			<div id="comment-view">
-				<div class="comment-box">
-					<div class="comment-title">
-						John Smith
-					</div>
-					<div class="comment-text">
-						Lorem Ipsum
-					</div>
-				</div>
-				<div class="comment-box">
-					<div class="comment-title">
-						John Smith
-					</div>
-					<div class="comment-text">
-						Lorem Ipsum
-					</div>
-				</div>
-				<div class="comment-box">
-					<div class="comment-title">
-						John Smith
-					</div>
-					<div class="comment-text">
-						Lorem Ipsum
-					</div>
-				</div>
-				<div class="comment-box">
-					<div class="comment-title">
-						John Smith
-					</div>
-					<div class="comment-text">
-						Lorem Ipsum
-					</div>
-				</div>
-			</div>
+			<div id="comment-view"></div>
 
 			<div id="comment-new">
 				<form id="comment-form" enctype="multipart/form-data" 
@@ -69,7 +37,7 @@
 					<input type="text" 		name="user" 		id="user" 		value="Anonymous" />
 					<p>
 						Commenting on:
-							<span id="lineStartNum">?</span>-<span id="lineEndNum">?</span><br/>
+							<span id="line-start-num">?</span>-<span id="line-end-num">?</span><br/>
 						<textarea id="text" name="text"></textarea><br />
 						<textarea id="diffs" name="diffs"></textarea><br />
 						<input type="submit" />
