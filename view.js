@@ -178,22 +178,22 @@ CodeReview = (function( CodeReview ) {
 	function showCommentBox(start,end) {
 		selection_start = start;
 		selection_end = end;
-		$('input#line_start').val(start);
-		$('input#line_end').val(end);
-		$('#lineStartNum').text(start);
-		$('#lineEndNum').text(end);
+		$('input#line-start').val(start);
+		$('input#line-end').val(end);
+		$('#line-start-num').text(start);
+		$('#line-end-num').text(end);
 		diffMirror.setOption("firstLineNumber",start);
 		diffMirror.setValue(codeMirror.getRange(
 			{line:start-1,ch:0},
 			{line:end-1,ch:999999}));
-		var comment_box = $('#comment_box');
+		var comment_box = $('#comment-new');
 		var coords = codeMirror.charCoords({line:start-1,char:0});
 		comment_box.css('top',coords.y);
 		comment_box.slideDown();
 	}
 
 	function closeCommentBox() {
-		$('#comment_box').hide();
+		$('#comment-new').hide();
 		selection_start = -1;
 		selection_end = -1;
 	}
@@ -231,9 +231,9 @@ CodeReview = (function( CodeReview ) {
 		}
 		commentMirrors[lineNumber] = [];
 		codeMirror.setMarker(lineNumber,
-							 "<span class='commentNumber'>("+
+							 "<span class='comment-number'>("+
 							 commentSet.length+")</span> %N%");
-		var set = $("<div class='commentSet'>");
+		var set = $("<div class='comment-set'>");
 		var coords = codeMirror.charCoords({line:lineNumber,char:0});
 		//console.log('coords');
 		//console.dir(coords);
@@ -241,11 +241,11 @@ CodeReview = (function( CodeReview ) {
 		set.attr("lineNumber",lineNumber);
 		for(var i=0;i<commentSet.length;i++){
 			var comment = commentSet[i];
-			var commentDiv = $("<div class='commentBox'>");
+			var commentDiv = $("<div class='comment-box'>");
 			commentDiv.mouseover({startLine:comment.line_start,endLine:comment.line_end},setSelection);
-			var title = $("<div class='commentTitle'>");
+			var title = $("<div class='comment-title'>");
 			title.text(comment.user);
-			var body = $("<div class='commentBody'>");
+			var body = $("<div class='comment-body'>");
 			body.text(comment.text);
 			
 			commentDiv.append(title);
@@ -254,7 +254,7 @@ CodeReview = (function( CodeReview ) {
 			set.append(commentDiv);
 			
 			if(comment.diffs){
-				var diffs = $("<textarea class='commentDiffs'>");
+				var diffs = $("<textarea class='comment-diffs'>");
 				var from = {line:comment.line_start-1,ch:0};
 				var to = {line:comment.line_end-1,ch:999999};
 				var original = codeMirror.getRange(from,to);
@@ -304,21 +304,21 @@ CodeReview = (function( CodeReview ) {
 								appliedDiffs.indexOf(rawDiffs),1);
 						}
 					})
-					commentDiv.append($("<label>Use this diff</label>"));
+					commentDiv.append($("<label>Use this diff &nbsp;</label>"));
 					commentDiv.append(useIt);
 				}
 			}
 			
 		}
 
-		$("#commentsDiv").append(set);
+		$("#comment-view").append(set);
 		set.hide();
 	}
 
 	function showComments(codeMirror, lineNumber){
 		closeCommentBox();
 		hideComments();
-		$(".commentSet[lineNumber='"+lineNumber+"']").slideDown();
+		$(".comment-set[lineNumber='"+lineNumber+"']").slideDown();
 		var mirrors = commentMirrors[lineNumber];
 		for(var index in mirrors){
 			mirrors[index].refresh();
@@ -326,13 +326,13 @@ CodeReview = (function( CodeReview ) {
 	}
 
 	function hideComments(){
-		$(".commentSet").hide();
+		$(".comment-set").hide();
 	}
 	
 	function merge(){
 		if(!mergeMirror){
 			var area = $("<textarea>");
-			$("#codeDiv").append(area);
+			$("#code").append(area);
 			mergeMirror = CodeMirror.fromTextArea(area.get(0),codeOptions);
 		}
 		mergeMirror.setValue(codeMirror.getValue());
@@ -364,10 +364,10 @@ CodeReview = (function( CodeReview ) {
 		if((typeof code) === "string"){
 			code = jQuery.parseJSON(code);
 		}
-		$('#code_id').val(code.id);
+		$('#code-id').val(code.id);
 		var lines = code.text.split('\n');
 		num_lines = lines.length;
-		$("#code").text(code.text);
+		$("#code-view").text(code.text);
 		if(!codeMirror){
 			getLanguage(code.language_id,function(language_ob) {
 				var language = language_data.data[language_ob.mode];
@@ -420,18 +420,17 @@ CodeReview = (function( CodeReview ) {
 				}
 				
 				codeMirror = CodeMirror.fromTextArea(
-					document.getElementById("code"),codeOptions);
+					document.getElementById("code-view"),codeOptions);
 				diffMirror = CodeMirror.fromTextArea(
 					document.getElementById("diffs"),diffOptions);
 
-				// MINIMAP TIME
-				apply_minimap( codeMirror );
+				// TODO: Make the code appear in the minimap
 				
 				getComments(code.id,writeComments,handleAjaxError);
 			},handleAjaxError);
 		}else{
 			comments = [];
-			$(".commentSet").remove();
+			$(".comment-set").remove();
 			getComments(code.id,writeComments,handleAjaxError);
 		}
 	}
@@ -448,7 +447,7 @@ CodeReview = (function( CodeReview ) {
 		$('#user').change(function() {
 			createCookie('username',$('#user').val());
 		});
-		$('#comment_box').hide();
+		$('#comment-new').hide();
 		$('#error').hide();
 		// retrieve and display code
 		var query = URI(document.URL).query(true);
@@ -459,7 +458,7 @@ CodeReview = (function( CodeReview ) {
 			reportError("Code ID not found");
 			return;
 		}
-		$('#comment_form').ajaxForm({
+		$('#comment-form').ajaxForm({
 			beforeSerialize: function() {
 				diffMirror.save();
 			},
@@ -470,7 +469,7 @@ CodeReview = (function( CodeReview ) {
 			},
 			error:handleAjaxError
 		});
-		$('#codeDiv').append(
+		$('#code').append(
 			$('<button type="button">Merge Diffs</input>').click(merge));
 		getLanguageData(function(language_ob) {
 			language_data = language_ob;
