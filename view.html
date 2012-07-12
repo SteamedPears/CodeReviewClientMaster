@@ -2,43 +2,49 @@
 	<head>
 		<title>CodeReview</title>
 		<!-- CSS -->
-		<link href="include/CodeMirror/lib/codemirror.css" rel="stylesheet">
-		<link href="view.css" rel="stylesheet">
+		<link href="include/CodeMirror/lib/codemirror.css" rel="stylesheet" />
+		<link href="view.css" rel="stylesheet" />
 		<!-- JS -->
 		<script src="js/jquery-1.7.2.min.js"></script>
 		<script src="include/URI.js"></script>
 		<script src="include/diff_match_patch/javascript/diff_match_patch.js"></script>
 		<script src="include/CodeMirror/lib/codemirror.js"></script>
 		<script src="js/jquery.form.js"></script>
+		<script src="js/jquery-ui-1.8.21.custom.min.js"></script>
 		<script src="view.js"></script>
-		
 	</head>
 	<body>
 		<h1><a href="index.html">CodeReview</a></h1>
 		<div id="error"></div>
-		<div id="codeDiv">
-			<textarea id="code"></textarea>
-			
+
+		<div id="code">
+			<textarea id="code-view"></textarea>
 		</div>
-		<div>
-			<div id="commentsDiv">
-				
-			</div>
-			<div id="comment_box">
-				<form id="comment_form" enctype="multipart/form-data" 
+
+		<div id="comment">
+			<div id="comment-view"></div>
+
+			<div id="comment-new">
+				<form id="comment-form" enctype="multipart/form-data" 
 				  method="POST" action="do/newcomment">
-					<input type="hidden" name="code_id" id="code_id" value="-1">
-					<input type="hidden" name="line_start" id="line_start" value="-1">
-					<input type="hidden" name="line_end" id="line_end" value="-1">
-					<input id="user" type="text" name="user" value="Anonymous">
-					Commenting on: 
-					<span id="lineStartNum">?</span>-<span id="lineEndNum">?</span><br/>
-					<textarea id="text" name="text"></textarea></br>
-					<textarea id="diffs" name="diffs"></textarea></br>
-					<input type="submit">
+					<input type="hidden" 	name="code_id" 		id="code-id" 	value="-1" />
+					<input type="hidden" 	name="line_start" 	id="line-start" value="-1" />
+					<input type="hidden" 	name="line_end" 	id="line-end" 	value="-1" />
+					<input type="text" 		name="user" 		id="user" 		value="Anonymous" />
+					<p>
+						Commenting on:
+							<span id="line-start-num">?</span>-<span id="line-end-num">?</span><br/>
+						<textarea id="text" name="text"></textarea><br />
+						<textarea id="diffs" name="diffs"></textarea><br />
+						<input type="submit" />
+					</p>
 				</form>
-		  	</div>
-		
+		  	</div>		
 		</div>
+
+		<div id="minimap">
+			<textarea></textarea>
+		</div>
+
 	</body>
 </html>

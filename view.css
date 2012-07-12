@@ -1,130 +1,139 @@
-/******************************************************************************
-* view.css                                                                    *
-* Copyright 2012, Alexis Beingessner and Simon Pratt                          *
-******************************************************************************/
-body {
-	min-width: 74em;
-	margin: 0;
-	margin-left: 2px;
-	padding: 0;
-}
-#comment_window {
-	position: absolute;
-}
-#title_bar {
-	background-color: #ccc;
-}
-#comment_text {
-	margin: 3px;
+html, body {
+	height: 99.99%;
+	width: 99.99%;
 }
 
-.user_name {
-	font-size: 14px;
-	font-weight: bold;
-}
-.button {
-	cursor: default;
-	border: solid 1px black;
-	background-color: #f8f8f8;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
+body, div, p, pre, img, table, h1, h2, h3, h4, textarea, input {
+	padding: 0px;
+	margin: 0px;
+	font-family: Arial;
 }
 
-.commentBox {
-	border: solid 1px black;
-	background-color: #f8f8f8;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
-}
-
-.commentTitle{
-	background-color: #ccc;
-}
-.commentBody{
-	margin: 3px;
-}
-.commentSet{
-	width:40%;
-	position: absolute;
-}
-.commentDiffs{
-	width:100%;
-	height:auto;
-	overflow:visible;
-}
-
-#user {
-	width: 20em;
-}
-#text {
-	width: 100%;
-	resize: none;
-	height: 20em;
-}
-#comment_box {
-	width:40%;
-	position:absolute;
+a { 
+	color: #0174DF;
 }
 
 #error {
-	background-color: Red;
-	color: White;
-	border: solid 1px black;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
+	background-color: #FE2E2E;
 }
 
-#codeDiv{
-	width:46em;
-	float:right;
+#code {
+	width: 45em;
+	float: left;
 }
 
-#commentsDiv{
-	width:40%;
-	height:100%;
-	float:left;
+#code-view {
+	width: 100%;
 }
 
-#code{
-	width:100%;
-	height:auto;
-	overflow:visible;
+#comment {
+	padding-top: 5px;
+	padding-left: 3px;
+	width: 30%;
+	float: left;
+}
+
+#comment-new input, textarea {
+	width: 80%;
+	margin-bottom: 3px;
+}
+
+#comment > #comment-view .comment-box {
+	border: 1px solid #CCCCCC;
+	margin-bottom: 4px;
+}
+
+.comment-box .comment-title {
+	background-color: #AAAAAA;
+	color: #000000;
+	font-weight: bold;
+	padding-top: 3px;
+	padding-left: 2px;
+	font-size: 0.9em;
+}
+
+.comment-box .comment-text {
+	background-color: #FCFCFC;
+	padding-top: 3px;
+	padding-left: 2px;
+}
+
+#comment #comment-new {
+	margin-top: 10px;
+}
+
+#comment > #comment-new {
+	padding: 5px 5px 3px 3px;
+	border: 1px solid #CCCCCC;
+}
+
+#comment > #comment-new input[type=submit] {
+	width: 50px;
+}
+
+#minimap {
+	position: fixed;
+	top: 0px;
+	right: 0px;
+	width: 100px;
+	height: 99.99%;
+	z-index: 2;
+	overflow: hidden;
+	opacity: 0.5;
+}
+
+#minimap textarea {
+	width: 100%;
+	height: 100%;
+	background-color: #CCCCCC;
+	font-size: 3px;
+	cursor: default;
+	/* Disable selection <http://stackoverflow.com/a/4358620> */
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .CodeMirror-scroll {
 	height: auto;
 	overflow: visible;
 }
+
 .CodeMirror-gutter {
 	width: 5em;
 	background: white;
 }
+
 .CodeMirror {
-	border: 1px solid #aaa;
+	border: 1px solid #AAAAAA;
 }
 
-.commentNumber{
+.comment-number{
 	float:left;
 }
-
-
-
 
 .diffStyle_-1{
 	background-color:rgb(255,200,200);
 	margin:0;
 	padding:0;
 	border:0;
+	display: block;
 }
 .diffStyle_0{
-
+	display: block;
 }
 .diffStyle_1{
-	background-color:rgb(200,255,200);
+	background-color: rgb( 200, 255, 200 );
 	margin:0;
 	padding:0;
 	border:0;
+	display: block;
+}
+
+.CodeMirror, .CodeMirror-scroll {
+	min-height: 2em;
+	line-height: 1.3em;
 }
