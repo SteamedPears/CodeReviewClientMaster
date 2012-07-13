@@ -1,3 +1,6 @@
 do/
 *.sublime-project
 *.sublime-workspace
+
+# Removed the shortcut
+include/CodeMirror
