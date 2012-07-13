@@ -6,7 +6,6 @@ html, body {
 body, div, p, pre, img, table, h1, h2, h3, h4, textarea, input {
 	padding: 0px;
 	margin: 0px;
-	font-family: Arial;
 }
 
 a { 
@@ -102,6 +101,10 @@ a {
 	user-select: none;
 }
 
+.CodeMirror {
+	border: 1px solid #AAAAAA;
+}
+
 .CodeMirror-scroll {
 	height: auto;
 	overflow: visible;
@@ -110,10 +113,6 @@ a {
 .CodeMirror-gutter {
 	width: 5em;
 	background: white;
-}
-
-.CodeMirror {
-	border: 1px solid #AAAAAA;
 }
 
 .comment-number{
