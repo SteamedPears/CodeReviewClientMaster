@@ -10,24 +10,27 @@ var CodeReview = CodeReview || {};
 CodeReview = (function( CodeReview ) {
 	var comments_div,
 	highlight_start = -1,
-	highlight_end = -1,
+	highlight_end 	= -1,
 	selection_start = -1,
-	selection_end = -1,
-	comment_ob = null,
-	comment_box_ob = null,
-	num_lines = -1,
-	comments = {},
-	language_data = null,
-	codeMirror = null,
-	diffMirror = null,
-	mergeMirror = null,
-	noSelect = false,
-	codeOptions = null,
-	diffOptions = null,
-	commentOptions = null,
-	commentMirrors = [],
-	diffComputer = new diff_match_patch(),
-	appliedDiffs = [];
+	selection_end 	= -1,
+	comment_ob 		= null,
+	comment_box_ob 	= null,
+	selection_ob 	= null,
+	num_lines 		= -1,
+	comments 		= {},
+	language_data 	= null,
+	codeMirror 		= null,
+	diffMirror 		= null,
+	mergeMirror 	= null,
+	noSelect 		= false,
+	codeOptions 	= null,
+	diffOptions 	= null,
+	commentOptions 	= null,
+	commentMirrors 	= [],
+	diffComputer 	= new diff_match_patch(),
+	appliedDiffs 	= [];
+	
+
 	CodeReview.codeMirror = undefined;
 
 /******************************************************************************
@@ -150,13 +153,20 @@ CodeReview = (function( CodeReview ) {
 * Highlighting                                                                *
 ******************************************************************************/
 
-	function getSelection(codeMirror){
+	function handleSelection( ){
 		if(!noSelect){
-			if(codeMirror.somethingSelected){
-				var start = codeMirror.getCursor(true).line + 1;
-				var end = codeMirror.getCursor(false).line + 1;
+			if( codeMirror.somethingSelected ){
+				var start = codeMirror.getCursor(true).line;
+				var end = codeMirror.getCursor(false).line;
+
+				// Adds the class to the new text
+				var top_line = codeMirror.charCoords({line:start,ch:0},"page").y;
+				top_line -= $('#code').position().top;
+				console.log(top_line);
+				$('#comment-new').css( 'top', top_line );
+				
 				hideComments();
-				showCommentBox(start,end);
+				showCommentBox( start+1 , end+1 );
 			}else{
 				hideCommentBox();
 			}
@@ -186,10 +196,7 @@ CodeReview = (function( CodeReview ) {
 		diffMirror.setValue(codeMirror.getRange(
 			{line:start-1,ch:0},
 			{line:end-1,ch:999999}));
-		var comment_box = $('#comment-new');
-		var coords = codeMirror.charCoords({line:start-1,char:0});
-		comment_box.css('top',coords.y);
-		comment_box.slideDown();
+		$('#comment-new').slideDown();
 	}
 
 	function closeCommentBox() {
@@ -220,7 +227,7 @@ CodeReview = (function( CodeReview ) {
 			comments[line_start].push(comment);
 		}
 		for(var i in comments){
-			buildCommentSet(Number(i)-1,comments[i]);
+			buildCommentSet(Number(i),comments[i]);
 		}
 	}
 
@@ -234,10 +241,6 @@ CodeReview = (function( CodeReview ) {
 							 "<span class='comment-number'>("+
 							 commentSet.length+")</span> %N%");
 		var set = $("<div class='comment-set'>");
-		var coords = codeMirror.charCoords({line:lineNumber,char:0});
-		//console.log('coords');
-		//console.dir(coords);
-		set.css('top',coords.y);
 		set.attr("lineNumber",lineNumber);
 		for(var i=0;i<commentSet.length;i++){
 			var comment = commentSet[i];
@@ -294,6 +297,7 @@ CodeReview = (function( CodeReview ) {
 					}
 					
 					mirror.setOption("firstLineNumber",lineNumber+1);
+
 					commentMirrors[lineNumber].push(mirror);
 					var useIt = $("<input type='checkbox'>");
 					useIt.click(function(){
@@ -318,7 +322,13 @@ CodeReview = (function( CodeReview ) {
 	function showComments(codeMirror, lineNumber){
 		closeCommentBox();
 		hideComments();
-		$(".comment-set[lineNumber='"+lineNumber+"']").slideDown();
+		var top_line = codeMirror.charCoords({line:lineNumber,char:0},"page").y;
+		top_line -= $('#code').position().top;
+		var set = $(".comment-set[lineNumber='"+lineNumber+"']");
+		console.log(lineNumber);
+		console.log(top_line);
+		set.css('top',top_line);
+		set.slideDown();
 		var mirrors = commentMirrors[lineNumber];
 		for(var index in mirrors){
 			mirrors[index].refresh();
@@ -395,7 +405,7 @@ CodeReview = (function( CodeReview ) {
 					readOnly: true,
 					mode: language.mode,
 					onGutterClick: showComments,
-					onCursorActivity: getSelection,
+					onCursorActivity: handleSelection
 				};
 				diffOptions = {
 					lineNumbers: true,
@@ -403,14 +413,14 @@ CodeReview = (function( CodeReview ) {
 					fixedGutter: true,
 					readOnly: false,
 					smartIndent:false,
-					mode: language.mode,
+					mode: language.mode
 				};
 				commentOptions = {
 					lineNumbers: true,
 					lineWrapping: true,
 					fixedGutter: true,
 					readOnly: true,
-					mode: language.mode,
+					mode: language.mode
 				};
 				
 				for(var index in language.options) {

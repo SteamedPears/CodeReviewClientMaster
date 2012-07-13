@@ -29,17 +29,14 @@ a {
 #comment {
 	padding-top: 5px;
 	padding-left: 3px;
-	width: 30%;
-	float: left;
-}
-
-#comment-set {
+	width: 35%;
 	position: absolute;
+	left: 45em;
 }
 
-#comment-new input, textarea {
-	width: 80%;
-	margin-bottom: 3px;
+.comment-set {
+	width: 100%;
+	position: absolute;
 }
 
 #comment > #comment-view .comment-box {
@@ -47,7 +44,7 @@ a {
 	margin-bottom: 4px;
 }
 
-.comment-box .comment-title {
+.comment-box > .comment-title {
 	background-color: #AAAAAA;
 	color: #000000;
 	font-weight: bold;
@@ -56,19 +53,22 @@ a {
 	font-size: 0.9em;
 }
 
-.comment-box .comment-text {
+.comment-box > .comment-text {
 	background-color: #FCFCFC;
 	padding-top: 3px;
 	padding-left: 2px;
 }
 
-#comment #comment-new {
-	margin-top: 10px;
-}
-
 #comment > #comment-new {
 	padding: 5px 5px 3px 3px;
 	border: 1px solid #CCCCCC;
+	position: absolute;
+	width: 100%;
+}
+
+#comment-new input, #comment-new textarea {
+	width: 80%;
+	margin-bottom: 3px;
 }
 
 #comment > #comment-new input[type=submit] {
@@ -111,7 +111,7 @@ a {
 }
 
 .CodeMirror-gutter {
-	width: 5em;
+	width: 5.5em;
 	background: white;
 }
 
