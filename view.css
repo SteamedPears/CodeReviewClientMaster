@@ -24,6 +24,7 @@ a {
 
 #code-view {
 	width: 100%;
+	position: absolute;
 }
 
 #comment {
@@ -31,6 +32,10 @@ a {
 	padding-left: 3px;
 	width: 30%;
 	float: left;
+}
+
+#comment-set {
+	position: absolute;
 }
 
 #comment-new input, textarea {
