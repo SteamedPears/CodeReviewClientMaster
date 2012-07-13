@@ -150,13 +150,17 @@ CodeReview = (function( CodeReview ) {
 * Highlighting                                                                *
 ******************************************************************************/
 
-	function getSelection(codeMirror){
+	function handleSelection( ){
 		if(!noSelect){
 			if(codeMirror.somethingSelected){
 				var start = codeMirror.getCursor(true).line + 1;
 				var end = codeMirror.getCursor(false).line + 1;
+				codeMirror.markText( 
+									{ line: start, ch: 0 }, 
+									{ line: end, ch: 0 }, 
+									'line-of-code' );
 				hideComments();
-				showCommentBox(start,end);
+				showCommentBox( start, end );
 			}else{
 				hideCommentBox();
 			}
@@ -186,10 +190,9 @@ CodeReview = (function( CodeReview ) {
 		diffMirror.setValue(codeMirror.getRange(
 			{line:start-1,ch:0},
 			{line:end-1,ch:999999}));
-		var comment_box = $('#comment-new');
-		var coords = codeMirror.charCoords({line:start-1,char:0});
-		comment_box.css('top',coords.y);
-		comment_box.slideDown();
+		var coords = codeMirror.charCoords({line:start ,char:0});
+		$('#comment-new').css('top', coords.y);
+		$('#comment-new').slideDown();
 	}
 
 	function closeCommentBox() {
@@ -235,8 +238,6 @@ CodeReview = (function( CodeReview ) {
 							 commentSet.length+")</span> %N%");
 		var set = $("<div class='comment-set'>");
 		var coords = codeMirror.charCoords({line:lineNumber,char:0});
-		//console.log('coords');
-		//console.dir(coords);
 		set.css('top',coords.y);
 		set.attr("lineNumber",lineNumber);
 		for(var i=0;i<commentSet.length;i++){
@@ -294,6 +295,7 @@ CodeReview = (function( CodeReview ) {
 					}
 					
 					mirror.setOption("firstLineNumber",lineNumber+1);
+
 					commentMirrors[lineNumber].push(mirror);
 					var useIt = $("<input type='checkbox'>");
 					useIt.click(function(){
@@ -395,7 +397,7 @@ CodeReview = (function( CodeReview ) {
 					readOnly: true,
 					mode: language.mode,
 					onGutterClick: showComments,
-					onCursorActivity: getSelection,
+					onCursorActivity: handleSelection
 				};
 				diffOptions = {
 					lineNumbers: true,
@@ -403,14 +405,14 @@ CodeReview = (function( CodeReview ) {
 					fixedGutter: true,
 					readOnly: false,
 					smartIndent:false,
-					mode: language.mode,
+					mode: language.mode
 				};
 				commentOptions = {
 					lineNumbers: true,
 					lineWrapping: true,
 					fixedGutter: true,
 					readOnly: true,
-					mode: language.mode,
+					mode: language.mode
 				};
 				
 				for(var index in language.options) {
@@ -423,6 +425,9 @@ CodeReview = (function( CodeReview ) {
 					document.getElementById("code-view"),codeOptions);
 				diffMirror = CodeMirror.fromTextArea(
 					document.getElementById("diffs"),diffOptions);
+
+				// Add the selection bindings
+				bindSelection();
 
 				// TODO: Make the code appear in the minimap
 				
