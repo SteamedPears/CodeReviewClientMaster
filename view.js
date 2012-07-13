@@ -162,7 +162,6 @@ CodeReview = (function( CodeReview ) {
 				// Adds the class to the new text
 				var top_line = codeMirror.charCoords({line:start,ch:0},"page").y;
 				top_line -= $('#code').position().top;
-				console.log(top_line);
 				$('#comment-new').css( 'top', top_line );
 				
 				hideComments();
@@ -325,8 +324,6 @@ CodeReview = (function( CodeReview ) {
 		var top_line = codeMirror.charCoords({line:lineNumber,char:0},"page").y;
 		top_line -= $('#code').position().top;
 		var set = $(".comment-set[lineNumber='"+lineNumber+"']");
-		console.log(lineNumber);
-		console.log(top_line);
 		set.css('top',top_line);
 		set.slideDown();
 		var mirrors = commentMirrors[lineNumber];
