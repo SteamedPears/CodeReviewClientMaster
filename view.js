@@ -236,9 +236,20 @@ CodeReview = (function( CodeReview ) {
 			return;
 		}
 		commentMirrors[lineNumber] = [];
-		codeMirror.setMarker(lineNumber,
+		/*codeMirror.setMarker(lineNumber,
 							 "<span class='comment-number'>("+
-							 commentSet.length+")</span> %N%");
+							 commentSet.length+")</span> %N%");*/
+		
+		var commentInfo = $("#comment-info");
+		var commentInfoBtn =  $("<button>");
+		commentInfoBtn.text(commentSet.length+" comments");
+		commentInfoBtn.css("position","absolute");
+		var top_line = codeMirror.charCoords({line:lineNumber-1},"page").y;
+		
+		commentInfoBtn.css("top",top_line);
+		commentInfoBtn.click(lineNumber,showComments);
+		commentInfo.append(commentInfoBtn);
+		
 		var set = $("<div class='comment-set'>");
 		set.attr("lineNumber",lineNumber);
 		for(var i=0;i<commentSet.length;i++){
@@ -318,7 +329,9 @@ CodeReview = (function( CodeReview ) {
 		set.hide();
 	}
 
-	function showComments(codeMirror, lineNumber){
+	function showComments(event){
+		var lineNumber = event.data;
+		console.log(lineNumber);
 		closeCommentBox();
 		hideComments();
 		var top_line = codeMirror.charCoords({line:lineNumber,char:0},"page").y;
@@ -401,7 +414,6 @@ CodeReview = (function( CodeReview ) {
 					fixedGutter: true,
 					readOnly: true,
 					mode: language.mode,
-					onGutterClick: showComments,
 					onCursorActivity: handleSelection
 				};
 				diffOptions = {
