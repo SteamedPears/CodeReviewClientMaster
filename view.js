@@ -155,10 +155,12 @@ CodeReview = (function( CodeReview ) {
 
 	function handleSelection( ){
 		if(!noSelect){
-			if( codeMirror.somethingSelected ){
+			if( codeMirror.somethingSelected()){
 				var start = codeMirror.getCursor(true).line;
 				var end = codeMirror.getCursor(false).line;
-
+				if(codeMirror.getCursor(false).ch==0){
+					end--;
+				}
 				// Adds the class to the new text
 				var top_line = codeMirror.charCoords({line:start,ch:0},"page").y;
 				top_line -= $('#code').position().top;
@@ -167,7 +169,7 @@ CodeReview = (function( CodeReview ) {
 				hideComments();
 				showCommentBox( start+1 , end+1 );
 			}else{
-				hideCommentBox();
+				closeCommentBox();
 			}
 		}
 	}
@@ -185,6 +187,7 @@ CodeReview = (function( CodeReview ) {
 ******************************************************************************/
 
 	function showCommentBox(start,end) {
+		console.log(start,end);
 		selection_start = start;
 		selection_end = end;
 		$('input#line-start').val(start);
@@ -192,9 +195,12 @@ CodeReview = (function( CodeReview ) {
 		$('#line-start-num').text(start);
 		$('#line-end-num').text(end);
 		diffMirror.setOption("firstLineNumber",start);
-		diffMirror.setValue(codeMirror.getRange(
+		var text = codeMirror.getRange(
 			{line:start-1,ch:0},
-			{line:end-1,ch:999999}));
+			{line:end-1,ch:999999});
+		console.log(text);
+		diffMirror.setValue(text);
+		diffMirror.refresh();
 		$('#comment-new').slideDown();
 	}
 
