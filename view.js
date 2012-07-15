@@ -241,13 +241,14 @@ CodeReview = (function( CodeReview ) {
 							 commentSet.length+")</span> %N%");*/
 		
 		var commentInfo = $("#comment-info");
-		var commentInfoBtn =  $("<button>");
+		var commentInfoBtn =  $("<button class='commentButton'>");
 		commentInfoBtn.text(commentSet.length+" comments");
 		commentInfoBtn.css("position","absolute");
 		var top_line = codeMirror.charCoords({line:lineNumber-1},"page").y;
 		
 		commentInfoBtn.css("top",top_line);
 		commentInfoBtn.click(lineNumber,showComments);
+		commentInfoBtn.attr("lineNumber",lineNumber-1);
 		commentInfo.append(commentInfoBtn);
 		
 		var set = $("<div class='comment-set'>");
@@ -316,9 +317,6 @@ CodeReview = (function( CodeReview ) {
 					
 					useIt.click(function(){
 						var diffNum = $(this).attr("value");
-						console.log("diffNum",diffNum);
-						console.log("list",rawDiffsList);
-						console.log("entry",rawDiffsList[diffNum]);
 						if($(this).is(":checked")){
 							appliedDiffs.push(rawDiffsList[diffNum]);	
 						}else{
@@ -346,11 +344,13 @@ CodeReview = (function( CodeReview ) {
 		top_line -= $('#code').position().top;
 		var set = $(".comment-set[lineNumber='"+lineNumber+"']");
 		set.css('top',top_line);
-		set.slideDown();
-		var mirrors = commentMirrors[lineNumber];
-		for(var index in mirrors){
-			mirrors[index].refresh();
-		}
+		set.slideDown(400,function(){
+			var mirrors = commentMirrors[lineNumber];
+			for(var index in mirrors){
+				mirrors[index].refresh();
+			}
+		});
+		
 	}
 
 	function hideComments(){
@@ -381,7 +381,6 @@ CodeReview = (function( CodeReview ) {
 					result+=text;
 				}
 			}
-			console.log(diffSet.from,diffSet.to);
 			mergeMirror.replaceRange(result,diffSet.from,diffSet.to);
 		}
 		mergeMirror.refresh();
@@ -466,12 +465,33 @@ CodeReview = (function( CodeReview ) {
 				// TODO: Make the code appear in the minimap
 				
 				getComments(code.id,writeComments,handleAjaxError);
+				setTimeout(rustleMyJimmmies,1000);
 			},handleAjaxError);
 		}else{
 			comments = [];
 			$(".comment-set").remove();
 			getComments(code.id,writeComments,handleAjaxError);
 		}
+	}
+
+
+	function rustleMyJimmmies(){ //cludge to try to fix code mirror issues
+		console.log("rustling all the jimmies");
+		codeMirror.refresh();
+		diffMirror.refresh();
+		for(var lineNumber in commentMirrors){
+			var mirrorList = commentMirrors[lineNumber];
+			for(var i=0;i<mirrorList.length;i++){
+				mirrorList[i].refresh();
+			}
+		} 
+		$(".commentButton").each(function(){
+			var btn = $(this);
+			var top_line = codeMirror.charCoords( 
+				{line:Number(btn.attr("lineNumber"))},"page").y;
+		
+			btn.css("top",top_line);
+		});
 	}
 
 /******************************************************************************
