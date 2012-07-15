@@ -17,26 +17,38 @@ a {
 }
 
 #code {
-	width: 45em;
+	width: 45%;
 	float: left;
+	position: relative;
+	min-height:1px;
 }
 
 #code-view {
 	width: 100%;
 	position: absolute;
+	
 }
 
-#comment {
-	padding-top: 5px;
-	padding-left: 3px;
-	width: 35%;
-	position: absolute;
-	left: 45em;
+#comment-info{
+	float:left;
+	width:10%;
+	min-height:1px;
+}
+
+#right-side {
+	width:45%;
+	float:left;
+	min-height:1px;
+	position:relative;
+}
+
+.right-button{
+	float:right;
 }
 
 .comment-set {
 	width: 100%;
-	position: absolute;
+	position:absolute;
 }
 
 #comment > #comment-view .comment-box {
@@ -111,7 +123,6 @@ a {
 }
 
 .CodeMirror-gutter {
-	width: 5.5em;
 	background: white;
 }
 
@@ -119,22 +130,23 @@ a {
 	float:left;
 }
 
+.clear{
+	clear:both;
+}
+
 .diffStyle_-1{
 	background-color:rgb(255,200,200);
 	margin:0;
 	padding:0;
 	border:0;
-	display: block;
 }
 .diffStyle_0{
-	display: block;
 }
 .diffStyle_1{
 	background-color: rgb( 200, 255, 200 );
 	margin:0;
 	padding:0;
 	border:0;
-	display: block;
 }
 
 .CodeMirror, .CodeMirror-scroll {
