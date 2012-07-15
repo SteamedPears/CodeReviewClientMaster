@@ -236,11 +236,23 @@ CodeReview = (function( CodeReview ) {
 			return;
 		}
 		commentMirrors[lineNumber] = [];
-		codeMirror.setMarker(lineNumber,
+		/*codeMirror.setMarker(lineNumber,
 							 "<span class='comment-number'>("+
-							 commentSet.length+")</span> %N%");
+							 commentSet.length+")</span> %N%");*/
+		
+		var commentInfo = $("#comment-info");
+		var commentInfoBtn =  $("<button>");
+		commentInfoBtn.text(commentSet.length+" comments");
+		commentInfoBtn.css("position","absolute");
+		var top_line = codeMirror.charCoords({line:lineNumber-1},"page").y;
+		
+		commentInfoBtn.css("top",top_line);
+		commentInfoBtn.click(lineNumber,showComments);
+		commentInfo.append(commentInfoBtn);
+		
 		var set = $("<div class='comment-set'>");
 		set.attr("lineNumber",lineNumber);
+		var rawDiffsList = {};
 		for(var i=0;i<commentSet.length;i++){
 			var comment = commentSet[i];
 			var commentDiv = $("<div class='comment-box'>");
@@ -271,6 +283,7 @@ CodeReview = (function( CodeReview ) {
 					str+=diff[1];
 					hasDiffs = hasDiffs || diff[0];
 				}
+				rawDiffsList[i]=rawDiffs;
 				if(hasDiffs){
 					commentDiv.append(diffs);
 					diffs.text(str);
@@ -295,16 +308,22 @@ CodeReview = (function( CodeReview ) {
 						curPos = newPos;
 					}
 					
-					mirror.setOption("firstLineNumber",lineNumber+1);
+					mirror.setOption("firstLineNumber",lineNumber);
 
 					commentMirrors[lineNumber].push(mirror);
 					var useIt = $("<input type='checkbox'>");
+					useIt.attr("value",i);
+					
 					useIt.click(function(){
+						var diffNum = $(this).attr("value");
+						console.log("diffNum",diffNum);
+						console.log("list",rawDiffsList);
+						console.log("entry",rawDiffsList[diffNum]);
 						if($(this).is(":checked")){
-							appliedDiffs.push(rawDiffs);	
+							appliedDiffs.push(rawDiffsList[diffNum]);	
 						}else{
 							appliedDiffs.splice(
-								appliedDiffs.indexOf(rawDiffs),1);
+								appliedDiffs.indexOf(rawDiffsList[diffNum]),1);
 						}
 					})
 					commentDiv.append($("<label>Use this diff &nbsp;</label>"));
@@ -318,10 +337,12 @@ CodeReview = (function( CodeReview ) {
 		set.hide();
 	}
 
-	function showComments(codeMirror, lineNumber){
+	function showComments(event){
+		var lineNumber = event.data;
 		closeCommentBox();
 		hideComments();
-		var top_line = codeMirror.charCoords({line:lineNumber,char:0},"page").y;
+		discardMerge();
+		var top_line = codeMirror.charCoords({line:lineNumber-1},"page").y;
 		top_line -= $('#code').position().top;
 		var set = $(".comment-set[lineNumber='"+lineNumber+"']");
 		set.css('top',top_line);
@@ -336,10 +357,13 @@ CodeReview = (function( CodeReview ) {
 		$(".comment-set").hide();
 	}
 	
-	function merge(){
+/********************
+* Merging			*
+********************/
+	function computeMerge(){
 		if(!mergeMirror){
 			var area = $("<textarea>");
-			$("#code").append(area);
+			$("#merge-output").append(area);
 			mergeMirror = CodeMirror.fromTextArea(area.get(0),codeOptions);
 		}
 		mergeMirror.setValue(codeMirror.getValue());
@@ -357,9 +381,18 @@ CodeReview = (function( CodeReview ) {
 					result+=text;
 				}
 			}
+			console.log(diffSet.from,diffSet.to);
 			mergeMirror.replaceRange(result,diffSet.from,diffSet.to);
 		}
 		mergeMirror.refresh();
+		hideComments();
+		closeCommentBox();
+	}
+	
+	function discardMerge(){
+		$("#merge-output").empty();
+		
+		mergeMirror = null;
 	}
 
 /******************************************************************************
@@ -401,7 +434,6 @@ CodeReview = (function( CodeReview ) {
 					fixedGutter: true,
 					readOnly: true,
 					mode: language.mode,
-					onGutterClick: showComments,
 					onCursorActivity: handleSelection
 				};
 				diffOptions = {
@@ -476,8 +508,7 @@ CodeReview = (function( CodeReview ) {
 			},
 			error:handleAjaxError
 		});
-		$('#code').append(
-			$('<button type="button">Merge Diffs</input>').click(merge));
+		$('#merge-compute-button').click(computeMerge);
 		getLanguageData(function(language_ob) {
 			language_data = language_ob;
 			getCode(query.id,writeCodeLines,handleAjaxError);
