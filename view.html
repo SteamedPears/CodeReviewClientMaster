@@ -16,36 +16,46 @@
 	<body>
 		<h1><a href="index.html">CodeReview</a></h1>
 		<div id="error"></div>
-
-		<div id="code">
-			<textarea id="code-view"></textarea>
-		</div>
-		<div id="comment-info"></div>
-		<div id="right-side">
-			<div id="comment-view"></div>
-
-			<div id="comment-new">
-				<form id="comment-form" enctype="multipart/form-data" 
-				  method="POST" action="do/newcomment">
-					<input type="hidden" 	name="code_id" 		id="code-id" 	value="-1" />
-					<input type="hidden" 	name="line_start" 	id="line-start" value="-1" />
-					<input type="hidden" 	name="line_end" 	id="line-end" 	value="-1" />
-					<input type="text" 		name="user" 		id="user" 		value="Anonymous" />
-					<p>
-						Commenting on:
-							<span id="line-start-num">?</span>-<span id="line-end-num">?</span><br/>
-						<textarea id="text" name="text"></textarea><br />
-						<textarea id="diffs" name="diffs"></textarea><br />
-						<input type="submit" />
-					</p>
-				</form>
-		  	</div>
+		<div>
+			<div id="merge-controls">
+				<button class="right-button" id="merge-compute-button">Merge Diffs</button>
+			</div>
+			<div class="clear">
+				<div id="code">
+					<textarea id="code-view"></textarea>
+				</div>
+				<div id="comment-info"></div>
 		
-		</div>		
-		<!--
-		<div id="minimap">
-			<textarea></textarea>
-		</div>
-		-->
+				<div id="right-side">
+					<div id="merge-div">
+						<div id="merge-output"></div>
+					</div>
+					<div id="comment-view"></div>
+
+					<div id="comment-new">
+						<form id="comment-form" enctype="multipart/form-data" 
+						  method="POST" action="do/newcomment">
+							<input type="hidden" 	name="code_id" 		id="code-id" 	value="-1" />
+							<input type="hidden" 	name="line_start" 	id="line-start" value="-1" />
+							<input type="hidden" 	name="line_end" 	id="line-end" 	value="-1" />
+							<input type="text" 		name="user" 		id="user" 		value="Anonymous" />
+							<p>
+								Commenting on:
+									<span id="line-start-num">?</span>-<span id="line-end-num">?</span><br/>
+								<textarea id="text" name="text"></textarea><br />
+								<textarea id="diffs" name="diffs"></textarea><br />
+								<input type="submit" />
+							</p>
+						</form>
+				  	</div>
+		
+				</div>		
+				<!--
+				<div id="minimap">
+					<textarea></textarea>
+				</div>
+				-->
+			</div>
+		<div>
 	</body>
 </html>

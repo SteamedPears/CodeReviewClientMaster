@@ -42,6 +42,10 @@ a {
 	position:relative;
 }
 
+.right-button{
+	float:right;
+}
+
 .comment-set {
 	width: 100%;
 	position:absolute;
@@ -124,6 +128,10 @@ a {
 
 .comment-number{
 	float:left;
+}
+
+.clear{
+	clear:both;
 }
 
 .diffStyle_-1{
