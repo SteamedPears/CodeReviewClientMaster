@@ -181,6 +181,10 @@ CodeReview = (function( CodeReview ) {
 		codeMirror.setSelection({line:startLine,ch:0},{line:endLine,ch:0});
 		noSelect = false;
 	}
+	
+	function clearSelection(event){
+		codeMirror.setSelection({line:0},{line:0});
+	}
 
 /******************************************************************************
 * Comment Input                                                               *
@@ -263,7 +267,9 @@ CodeReview = (function( CodeReview ) {
 		for(var i=0;i<commentSet.length;i++){
 			var comment = commentSet[i];
 			var commentDiv = $("<div class='comment-box'>");
-			commentDiv.mouseover({startLine:comment.line_start,endLine:comment.line_end},setSelection);
+			commentDiv.mouseover({startLine:comment.line_start, 
+				endLine:comment.line_end},setSelection);
+			commentDiv.mouseout(clearSelection);
 			var title = $("<div class='comment-title'>");
 			title.text(comment.user);
 			var body = $("<div class='comment-body'>");
