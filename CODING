@@ -24,8 +24,8 @@ Table of Contents
  	Refer to CSS for id and class naming standards
 
 ## 2.0 JavaScript
-	Single quotes - foo( 'bar' )
-	Spaces before and after attributes within parentheses
+	Single quotes - foo('bar')
+	No spaces before and after attributes within parentheses - function (x) {
 	Curly braces on their opening line - function() {
 	Unquoted keys in objects - {foo:'bar'}
 	Use JSHint
