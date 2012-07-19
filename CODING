@@ -24,23 +24,17 @@ Table of Contents
  	Refer to CSS for id and class naming standards
 
 ## 2.0 JavaScript
-	Single quotes - foo( 'bar' )
-	Spaces before and after attributes within parentheses
+	Single quotes - foo('bar')
+	No spaces before and after attributes within parentheses - function (x) {
 	Curly braces on their opening line - function() {
 	Unquoted keys in objects - {foo:'bar'}
 	Use JSHint
+	No fancy ExpressJS style comma first continuations
+	Declare var statements whenever you need a new variable. Not just one var statement per function up top.
 
 ## 3.0 CSS
 	Lower case - this-is-an-id
 	Use dashes for spaces in classes and ids - .this-is-a-class
 
 ## A.0 Proposals
-	# A.1 Comma-first expression continuation
-		While continuing a comma delimiated expression, to aid readability,
-		we propose to starting every new line with the comma.
-
-		This will make continuations very obvious. Bewbs.
-
-		var 	variableName
-				, blah
-				, name2;
+	
