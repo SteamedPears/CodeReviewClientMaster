@@ -12,8 +12,19 @@ a {
 	color: #0174DF;
 }
 
+label{
+	border:200px;
+}
+
+.column{
+	float:left;
+	width:40%;
+	padding:5px;
+}
+
 #error {
 	background-color: #FE2E2E;
+	text-decoration:none;
 }
 
 #code {
@@ -33,6 +44,7 @@ a {
 	float:left;
 	width:10%;
 	min-height:1px;
+	position:relative;
 }
 
 #right-side {
@@ -49,6 +61,10 @@ a {
 .comment-set {
 	width: 100%;
 	position:absolute;
+}
+
+#comment-view{
+	min-height:1;
 }
 
 #comment > #comment-view .comment-box {
@@ -71,7 +87,7 @@ a {
 	padding-left: 2px;
 }
 
-#comment > #comment-new {
+#comment-new {
 	padding: 5px 5px 3px 3px;
 	border: 1px solid #CCCCCC;
 	position: absolute;
