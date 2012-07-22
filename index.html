@@ -17,12 +17,26 @@
 		Insert the code you would like reviewed then
 		hit submit, and share the url with your reviewers.
 
-		<form action="do/newcode" method="POST" enctype="multipart/form-data">
-			<textarea id="code" name="text" cols="80" class="pre"
-					  style="height:90%;font-size:14pt"></textarea><br>
-			<select id="language_id" name="language_id">
-			</select>
-			<input type="submit">
+		<form action="/do/newcode" method="POST" enctype="multipart/form-data">
+			<div class="column">
+				<textarea id="code" name="text" cols="80" class="pre"
+					style="height:90%;font-size:14pt"></textarea><br>
+			</div>
+			<div class="column">
+				<div>
+					<label for="custom-id">Custom ID:</label>
+					<input type="text" name="custom-id"
+						placeholder="leave blank for random ID"/>
+				</div>
+				<div>
+					<label for="language_id">Syntax Highlighting:</label>
+					<select id="language_id" name="language_id" />
+				</div>
+				<br>
+				<div>
+					<input type="submit">
+				</div>
+			</div>
 		</form>
 	</body>
 </html>

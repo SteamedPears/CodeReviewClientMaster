@@ -115,7 +115,7 @@ CodeReview = (function( CodeReview ) {
 ******************************************************************************/
 
 	function getCode(id,success_fn,error_fn) {
-		$.ajax('do/code',{
+		$.ajax('/do/code',{
 			data:	 {id:id},
 			dataType: 'json',
 			error:	error_fn,
@@ -124,7 +124,7 @@ CodeReview = (function( CodeReview ) {
 	}
 
 	function getComments(id,success_fn,error_fn) {
-		$.ajax('do/comments',{
+		$.ajax('/do/comments',{
 			data:	 {code_id:id},
 			dataType: 'json',
 			error:	error_fn,
@@ -133,7 +133,7 @@ CodeReview = (function( CodeReview ) {
 	}
 
 	function getLanguage(id,success_fn,error_fn) {
-		$.ajax('do/language',{
+		$.ajax('/do/language',{
 			data:	 {id:id},
 			dataType: 'json',
 			error:	error_fn,
