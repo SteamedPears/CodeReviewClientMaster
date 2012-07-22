@@ -270,8 +270,7 @@ var CodeReview = (function( CodeReview ) {
 					comment.line_end-1);
 				var original = getTextOnLines(codeArea,
 					comment.line_start, comment.line_end);
-				var diffString = comment.diffs;
-				var diffString = diffString.replace(/\r/gm,'');
+				var diffString = comment.diffs.replace(/\r/gm,'');
 				if(original != diffString){
 					
 					var rawDiffs = diffComputer.diff_main(original,diffString);
