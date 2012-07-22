@@ -458,7 +458,7 @@ var CodeReview = (function( CodeReview ) {
 					result+=text;
 				}
 			}
-			setTextOnRange(mergeArea,diffSet.range,text);
+			setTextOnRange(mergeArea,diffSet.range,result);
 		}
 		reRender(mergeArea);
 		hideComments();
