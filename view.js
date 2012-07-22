@@ -433,7 +433,7 @@ var CodeReview = (function( CodeReview ) {
 	}
 	
 	function comparePositions(a,b){
-		return b.range.start-a.range.start;
+		return b.range.start.line-a.range.start.line;
 	}
 	
 /********************
