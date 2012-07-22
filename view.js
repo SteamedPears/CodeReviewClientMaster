@@ -159,7 +159,6 @@ var CodeReview = (function( CodeReview ) {
 				var top = getPositionOfLine(codeArea,lines.start);
 				
 				$('#comment-new').css("top", top);
-				console.log(top,$('#comment-new').css("top"),$('#comment-new').css("position"));
 				hideComments();
 				showCommentBox(lines.start+1,lines.end+1);
 			}else{
@@ -269,11 +268,8 @@ var CodeReview = (function( CodeReview ) {
 				var diffs = $("<textarea class='comment-diffs'>");
 				var range = getRangeOfLines(comment.line_start-1,
 					comment.line_end-1);
-					console.log(comment.line_start,comment.line_end);
 				var original = getTextOnLines(codeArea,
 					comment.line_start, comment.line_end);
-				console.log("original",original)
-				console.log("diffs",comment.diffs);
 				var rawDiffs = diffComputer.diff_main(original,comment.diffs);
 				diffComputer.diff_cleanupSemantic(rawDiffs);
 				rawDiffs.from = range.from;
@@ -283,10 +279,8 @@ var CodeReview = (function( CodeReview ) {
 				for(var index = 0; index<rawDiffs.length; index++){
 					var diff = rawDiffs[index];
 					str+=diff[1];
-					console.log(diff[1]);
 					hasDiffs = hasDiffs || diff[0];
 				}
-				//console.log(str);
 				rawDiffsList[i]=rawDiffs;
 				if(hasDiffs){
 					commentDiv.append(diffs);
@@ -310,7 +304,6 @@ var CodeReview = (function( CodeReview ) {
 					commentAreas[lineNumber].push(area);
 					var useIt = $("<input type='checkbox'>");
 					useIt.attr("value",i);
-					//console.log(getText(area));
 					useIt.click(function(){
 						var diffNum = $(this).attr("value");
 						if($(this).is(":checked")){
@@ -338,7 +331,6 @@ var CodeReview = (function( CodeReview ) {
 		discardMerge();
 		var top = getPositionOfLine(codeArea,lineNumber-1);
 		var set = $(".comment-set[lineNumber='"+lineNumber+"']");
-		console.log(top,$(event.target).css("top"));
 		set.css('top',$(event.target).css("top"));
 		set.slideDown(400,function(){
 			var areas = commentAreas[lineNumber];
@@ -387,13 +379,6 @@ var CodeReview = (function( CodeReview ) {
 	function getPositionOfLine(area,line){
 		var pos = getPositionOfLineAbsolute(area,line);
 		var parent = $(area.getTextArea()).parent();
-		/*console.log("start",pos);
-		while(parent && parent.position && parent.position()){
-			pos -= parent.position().top;
-			console.log(pos,parent.position().top,parent);
-			parent = parent.parent();
-		}
-		console.log("end",pos);*/
 		if(parent.position()){
 			pos-=parent.position().top;
 		}
