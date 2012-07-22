@@ -5,9 +5,7 @@
 * This software is freely distributed under the ISC License.                  *
 * For details about the license, see the LICENSE file.                        *
 ******************************************************************************/
-
-var CodeReview = CodeReview || {};
-CodeReview = (function( CodeReview ) {
+var CodeReview = (function( CodeReview ) {
 	var comments_div,
 	highlight_start = -1,
 	highlight_end 	= -1,
@@ -19,19 +17,19 @@ CodeReview = (function( CodeReview ) {
 	num_lines 		= -1,
 	comments 		= {},
 	language_data 	= null,
-	codeMirror 		= null,
-	diffMirror 		= null,
-	mergeMirror 	= null,
+	codeArea 		= null,
+	diffArea 		= null,
+	mergeArea	 	= null,
 	noSelect 		= false,
 	codeOptions 	= null,
 	diffOptions 	= null,
 	commentOptions 	= null,
-	commentMirrors 	= [],
+	commentAreas 	= [],
 	diffComputer 	= new diff_match_patch(),
 	appliedDiffs 	= [];
 	
 
-	CodeReview.codeMirror = undefined;
+	CodeReview.codeArea = undefined;
 
 /******************************************************************************
 * Utility Functions                                                           *
@@ -153,21 +151,17 @@ CodeReview = (function( CodeReview ) {
 * Highlighting                                                                *
 ******************************************************************************/
 
-	function handleSelection( ){
+	function handleSelection(){
 		if(!noSelect){
-			if( codeMirror.somethingSelected()){
-				var start = codeMirror.getCursor(true).line;
-				var end = codeMirror.getCursor(false).line;
-				if(codeMirror.getCursor(false).ch==0){
-					end--;
-				}
-				// Adds the class to the new text
-				var top_line = codeMirror.charCoords({line:start,ch:0},"page").y;
-				top_line -= $('#code').position().top;
-				$('#comment-new').css( 'top', top_line );
+			if(somethingSelected(codeArea)){
+				var lines = getSelectedLines(codeArea);
 				
+				var top = getPositionOfLine(codeArea,lines.start);
+				
+				$('#comment-new').css("top", top);
+				console.log(top,$('#comment-new').css("top"),$('#comment-new').css("position"));
 				hideComments();
-				showCommentBox( start+1 , end+1 );
+				showCommentBox(lines.start+1,lines.end+1);
 			}else{
 				closeCommentBox();
 			}
@@ -178,12 +172,12 @@ CodeReview = (function( CodeReview ) {
 		var startLine = event.data.startLine-1;
 		var endLine = event.data.endLine;
 		noSelect = true;
-		codeMirror.setSelection({line:startLine,ch:0},{line:endLine,ch:0});
+		setSelectedLines(codeArea,startLine,endLine);
 		noSelect = false;
 	}
 	
-	function clearSelection(event){
-		codeMirror.setSelection({line:0},{line:0});
+	function clearCodeSelection(event){
+		clearSelection(codeArea);
 	}
 
 /******************************************************************************
@@ -191,20 +185,15 @@ CodeReview = (function( CodeReview ) {
 ******************************************************************************/
 
 	function showCommentBox(start,end) {
-		console.log(start,end);
 		selection_start = start;
 		selection_end = end;
 		$('input#line-start').val(start);
 		$('input#line-end').val(end);
 		$('#line-start-num').text(start);
 		$('#line-end-num').text(end);
-		diffMirror.setOption("firstLineNumber",start);
-		var text = codeMirror.getRange(
-			{line:start-1,ch:0},
-			{line:end-1,ch:999999});
-		console.log(text);
-		diffMirror.setValue(text);
-		diffMirror.refresh();
+		setFirstLineNumber(diffArea,start);
+		var text = getTextOnLines(codeArea,start,end);
+		setText(diffArea,text);
 		$('#comment-new').slideDown();
 	}
 
@@ -223,7 +212,6 @@ CodeReview = (function( CodeReview ) {
 			comments_ob = jQuery.parseJSON(comments_ob);
 		}
 		buildCommentStructure(comments_ob);
-		codeMirror.refresh();
 	}
 
 	function buildCommentStructure(comments_ob) {
@@ -241,22 +229,19 @@ CodeReview = (function( CodeReview ) {
 	}
 
 	function buildCommentSet(lineNumber,commentSet) {
-		if(codeMirror == null) {
-			logError('Tried to build comment set while code mirror null');
+		if(codeArea == null) {
+			logError('Tried to build comment set while codeArea null');
 			return;
 		}
-		commentMirrors[lineNumber] = [];
-		/*codeMirror.setMarker(lineNumber,
-							 "<span class='comment-number'>("+
-							 commentSet.length+")</span> %N%");*/
+		commentAreas[lineNumber] = [];
 		
 		var commentInfo = $("#comment-info");
 		var commentInfoBtn =  $("<button class='commentButton'>");
 		commentInfoBtn.text(commentSet.length+" comments");
 		commentInfoBtn.css("position","absolute");
-		var top_line = codeMirror.charCoords({line:lineNumber-1},"page").y;
+		var top = getPositionOfLine(codeArea,lineNumber-1);
 		
-		commentInfoBtn.css("top",top_line);
+		commentInfoBtn.css("top",top);
 		commentInfoBtn.click(lineNumber,showComments);
 		commentInfoBtn.attr("lineNumber",lineNumber-1);
 		commentInfo.append(commentInfoBtn);
@@ -269,7 +254,7 @@ CodeReview = (function( CodeReview ) {
 			var commentDiv = $("<div class='comment-box'>");
 			commentDiv.mouseover({startLine:comment.line_start, 
 				endLine:comment.line_end},setSelection);
-			commentDiv.mouseout(clearSelection);
+			commentDiv.mouseout(clearCodeSelection);
 			var title = $("<div class='comment-title'>");
 			title.text(comment.user);
 			var body = $("<div class='comment-body'>");
@@ -282,51 +267,50 @@ CodeReview = (function( CodeReview ) {
 			
 			if(comment.diffs){
 				var diffs = $("<textarea class='comment-diffs'>");
-				var from = {line:comment.line_start-1,ch:0};
-				var to = {line:comment.line_end-1,ch:999999};
-				var original = codeMirror.getRange(from,to);
+				var range = getRangeOfLines(comment.line_start-1,
+					comment.line_end-1);
+					console.log(comment.line_start,comment.line_end);
+				var original = getTextOnLines(codeArea,
+					comment.line_start, comment.line_end);
+				console.log("original",original)
+				console.log("diffs",comment.diffs);
 				var rawDiffs = diffComputer.diff_main(original,comment.diffs);
 				diffComputer.diff_cleanupSemantic(rawDiffs);
-				rawDiffs.from = from;
-				rawDiffs.to = to;
+				rawDiffs.from = range.from;
+				rawDiffs.to = range.to;
 				var str = "";
 				var hasDiffs = false;
 				for(var index = 0; index<rawDiffs.length; index++){
 					var diff = rawDiffs[index];
 					str+=diff[1];
+					console.log(diff[1]);
 					hasDiffs = hasDiffs || diff[0];
 				}
+				//console.log(str);
 				rawDiffsList[i]=rawDiffs;
 				if(hasDiffs){
 					commentDiv.append(diffs);
 					diffs.text(str);
 				
-					var mirror = CodeMirror.fromTextArea(
-						diffs.get(0),commentOptions);
+					var area = createArea(diffs.get(0),commentOptions);
 				
 					var curIndex = 0;
-					var curPos = mirror.posFromIndex(curIndex);
+					var curPos = getPosFromIndex(area,curIndex);
 					for(var index = 0; index<rawDiffs.length; index++){
 						var diff = rawDiffs[index];
 						var type = diff[0];
 						var text = diff[1];
 						var newIndex = curIndex+text.length;
-						var newPos = mirror.posFromIndex(newIndex);
-						if(newPos.ch==0){
-							newPos.line--;
-							newPos.ch=999999;
-						}
-						mirror.markText(curPos,newPos,"diffStyle_"+type);
+						var newPos = getPosFromIndex(area,newIndex);
+						styleText(area,curPos,newPos,"diffStyle_"+type);
 						curIndex = newIndex;
 						curPos = newPos;
 					}
-					
-					mirror.setOption("firstLineNumber",lineNumber);
-
-					commentMirrors[lineNumber].push(mirror);
+					setFirstLineNumber(area,lineNumber);
+					commentAreas[lineNumber].push(area);
 					var useIt = $("<input type='checkbox'>");
 					useIt.attr("value",i);
-					
+					//console.log(getText(area));
 					useIt.click(function(){
 						var diffNum = $(this).attr("value");
 						if($(this).is(":checked")){
@@ -352,36 +336,138 @@ CodeReview = (function( CodeReview ) {
 		closeCommentBox();
 		hideComments();
 		discardMerge();
-		var top_line = codeMirror.charCoords({line:lineNumber-1},"page").y;
-		top_line -= $('#code').position().top;
+		var top = getPositionOfLine(codeArea,lineNumber-1);
 		var set = $(".comment-set[lineNumber='"+lineNumber+"']");
-		set.css('top',top_line);
+		console.log(top,$(event.target).css("top"));
+		set.css('top',$(event.target).css("top"));
 		set.slideDown(400,function(){
-			var mirrors = commentMirrors[lineNumber];
-			for(var index in mirrors){
-				mirrors[index].refresh();
+			var areas = commentAreas[lineNumber];
+			for(var index in areas){
+				reRender(areas[index]);
 			}
 		});
-		
 	}
 
 	function hideComments(){
 		$(".comment-set").hide();
 	}
 	
+/*********************
+* TextArea Utilities *
+*********************/
+	
+	function getTextOnLines(area,startLine,endLine){
+		return area.getRange(
+			{line:startLine-1,ch:0},
+			{line:endLine-1,ch:999999});
+	}
+	
+	function getSelectedLines(area){
+		var result = {};
+		result.start = area.getCursor(true).line;
+		result.end = area.getCursor(false).line;
+		if(area.getCursor(false).ch==0){
+			result.end--;
+		}
+		return result;
+	}
+	
+	function setSelectedLines(area,startLine,endLine){
+		area.setSelection({line:startLine,ch:0},{line:endLine,ch:0});
+	}
+	
+	function clearSelection(area){
+		area.setSelection({line:0},{line:0});
+	}
+	
+	function somethingSelected(area){
+		return area.somethingSelected();
+	}
+	
+	function getPositionOfLine(area,line){
+		var pos = getPositionOfLineAbsolute(area,line);
+		var parent = $(area.getTextArea()).parent();
+		/*console.log("start",pos);
+		while(parent && parent.position && parent.position()){
+			pos -= parent.position().top;
+			console.log(pos,parent.position().top,parent);
+			parent = parent.parent();
+		}
+		console.log("end",pos);*/
+		if(parent.position()){
+			pos-=parent.position().top;
+		}
+		return pos;
+	}
+	
+	function getPositionOfLineAbsolute(area,line){
+		return area.charCoords({line:line,ch:0},"page").y;
+	}
+	
+	function setFirstLineNumber(area,number){
+		area.setOption("firstLineNumber",number);
+	}
+	
+	function setText(area,text){
+		area.setValue(text);
+		area.refresh();
+	}
+	
+	function getText(area){
+		return area.getValue();
+	}
+	
+	function getRangeOfLines(startLine,endLine){
+		var range = {};
+		range.from = {line:startLine,ch:0};
+		range.to = {line:endLine,ch:999999};
+		return range;
+	}
+	
+	function createArea(area,options){
+		return CodeMirror.fromTextArea(area,options);
+	}
+	
+	function getPosFromIndex(area,index){
+		var pos = area.posFromIndex(index);
+		if(pos.ch==0 && pos.line!=0){
+			pos.line--;
+			pos.ch=999999;
+		}
+		return pos;
+	}
+	
+	function styleText(area,startPos,endPos,style){
+		area.markText(startPos,endPos,style);
+	}
+	
+	function reRender(area){
+		area.refresh();
+	}
+	
+	function setTextOnRange(area,start,end,text){
+		area.replaceRange(text,start,end);
+	}
+	
+	function saveChanges(area){
+		area.save();
+	}
+	
+	function comparePositions(a,b){
+		return b.from.line-a.from.line;
+	}
+	
 /********************
 * Merging			*
 ********************/
 	function computeMerge(){
-		if(!mergeMirror){
+		if(!mergeArea){
 			var area = $("<textarea>");
 			$("#merge-output").append(area);
-			mergeMirror = CodeMirror.fromTextArea(area.get(0),codeOptions);
+			mergeArea = createArea(area.get(0),codeOptions);
 		}
-		mergeMirror.setValue(codeMirror.getValue());
-		appliedDiffs.sort(function(a,b){
-			return b.from.line-a.from.line;
-		});
+		setText(mergeArea,getText(codeArea));
+		appliedDiffs.sort(comparePositions);
 		for(var i in appliedDiffs){
 			var diffSet = appliedDiffs[i];
 			var result = "";
@@ -393,17 +479,16 @@ CodeReview = (function( CodeReview ) {
 					result+=text;
 				}
 			}
-			mergeMirror.replaceRange(result,diffSet.from,diffSet.to);
+			setTextOnRange(mergeArea,diffSet.from,diffSet.to,text);
 		}
-		mergeMirror.refresh();
+		reRender(mergeArea);
 		hideComments();
 		closeCommentBox();
 	}
 	
 	function discardMerge(){
 		$("#merge-output").empty();
-		
-		mergeMirror = null;
+		mergeArea = null;
 	}
 
 /******************************************************************************
@@ -419,7 +504,7 @@ CodeReview = (function( CodeReview ) {
 		var lines = code.text.split('\n');
 		num_lines = lines.length;
 		$("#code-view").text(code.text);
-		if(!codeMirror){
+		if(!codeArea){
 			getLanguage(code.language_id,function(language_ob) {
 				var language = language_data.data[language_ob.mode];
 				var req_ob = {};
@@ -469,9 +554,9 @@ CodeReview = (function( CodeReview ) {
 						commentOptions[index] = language.options[index];
 				}
 				
-				codeMirror = CodeMirror.fromTextArea(
+				codeArea = createArea(
 					document.getElementById("code-view"),codeOptions);
-				diffMirror = CodeMirror.fromTextArea(
+				diffArea = createArea(
 					document.getElementById("diffs"),diffOptions);
 
 				// TODO: Make the code appear in the minimap
@@ -489,19 +574,18 @@ CodeReview = (function( CodeReview ) {
 
 	function rustleMyJimmmies(){ //cludge to try to fix code mirror issues
 		console.log("rustling all the jimmies");
-		codeMirror.refresh();
-		diffMirror.refresh();
-		for(var lineNumber in commentMirrors){
-			var mirrorList = commentMirrors[lineNumber];
-			for(var i=0;i<mirrorList.length;i++){
-				mirrorList[i].refresh();
+		reRender(codeArea);
+		reRender(diffArea);
+		for(var lineNumber in commentAreas){
+			var areaList = commentAreas[lineNumber];
+			for(var i=0;i<areaList.length;i++){
+				reRender(areaList[i]);
 			}
 		} 
 		$(".commentButton").each(function(){
 			var btn = $(this);
-			var top_line = codeMirror.charCoords( 
-				{line:Number(btn.attr("lineNumber"))},"page").y;
-		
+			var top_line = getPositionOfLine(codeArea,
+				Number(btn.attr("lineNumber"))); 
 			btn.css("top",top_line);
 		});
 	}
@@ -531,7 +615,7 @@ CodeReview = (function( CodeReview ) {
 		}
 		$('#comment-form').ajaxForm({
 			beforeSerialize: function() {
-				diffMirror.save();
+				saveChanges(diffArea);
 			},
 			success:function(){
 				getCode(query.id,writeCodeLines,handleAjaxError);
@@ -548,4 +632,4 @@ CodeReview = (function( CodeReview ) {
 	});
 	
 	return CodeReview;
-})( CodeReview );
+})( CodeReview || {});

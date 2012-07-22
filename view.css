@@ -44,6 +44,7 @@ label{
 	float:left;
 	width:10%;
 	min-height:1px;
+	position:relative;
 }
 
 #right-side {
@@ -60,6 +61,10 @@ label{
 .comment-set {
 	width: 100%;
 	position:absolute;
+}
+
+#comment-view{
+	min-height:1;
 }
 
 #comment > #comment-view .comment-box {
@@ -82,7 +87,7 @@ label{
 	padding-left: 2px;
 }
 
-#comment > #comment-new {
+#comment-new {
 	padding: 5px 5px 3px 3px;
 	border: 1px solid #CCCCCC;
 	position: absolute;
