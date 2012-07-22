@@ -265,45 +265,28 @@ var CodeReview = (function( CodeReview ) {
 			set.append(commentDiv);
 			
 			if(comment.diffs){
-				var diffs = $("<textarea class='comment-diffs'>");
-				var range = getRangeOfLines(comment.line_start-1,
-					comment.line_end-1);
-				var original = getTextOnLines(codeArea,
+				var diffTextArea = $("<textarea class='comment-diffs'>");
+				var originalText = getTextOnLines(codeArea,
 					comment.line_start, comment.line_end);
-				var diffString = comment.diffs.replace(/\r/gm,'');
-				if(original != diffString){
+				var newText = comment.diffs.replace(/\r/gm,'');
+				
+				if(originalText != newText){	
+					var rawDiffs = computeDiffs(originalText,newText);
+					rawDiffs.range = getRangeOfLines(comment.line_start-1,
+					comment.line_end-1);
 					
-					var rawDiffs = diffComputer.diff_main(original,diffString);
-					diffComputer.diff_cleanupSemantic(rawDiffs);
-					rawDiffs.from = range.from;
-					rawDiffs.to = range.to;
-					var str = "";
-					var hasDiffs = false;
-					for(var index = 0; index<rawDiffs.length; index++){
-						var diff = rawDiffs[index];
-						str+=diff[1];
-						hasDiffs = hasDiffs || diff[0];
-					}
+					var diffs = computeDiffText(rawDiffs);
+					
 					rawDiffsList[i]=rawDiffs;
-					commentDiv.append(diffs);
-					diffs.text(str);
+					commentDiv.append(diffTextArea);
+					diffTextArea.text(diffs);
 				
-					var area = createArea(diffs.get(0),commentOptions);
+					var area = createArea(diffTextArea.get(0),commentOptions);
 				
-					var curIndex = 0;
-					var curPos = getPosFromIndex(area,curIndex);
-					for(var index = 0; index<rawDiffs.length; index++){
-						var diff = rawDiffs[index];
-						var type = diff[0];
-						var text = diff[1];
-						var newIndex = curIndex+text.length;
-						var newPos = getPosFromIndex(area,newIndex);
-						styleText(area,curPos,newPos,"diffStyle_"+type);
-						curIndex = newIndex;
-						curPos = newPos;
-					}
+					styleDiffArea(area,rawDiffs);
 					setFirstLineNumber(area,lineNumber);
 					commentAreas[lineNumber].push(area);
+					
 					var useIt = $("<input type='checkbox'>");
 					useIt.attr("value",i);
 					useIt.click(function(){
@@ -349,13 +332,10 @@ var CodeReview = (function( CodeReview ) {
 /*********************
 * TextArea Utilities *
 *********************/
-	
-	function getTextOnLines(area,startLine,endLine){
-		return area.getRange(
-			{line:startLine-1,ch:0},
-			{line:endLine-1,ch:999999});
+	function createArea(area,options){
+		return CodeMirror.fromTextArea(area,options);
 	}
-	
+
 	function getSelectedLines(area){
 		var result = {};
 		result.start = area.getCursor(true).line;
@@ -395,24 +375,40 @@ var CodeReview = (function( CodeReview ) {
 		area.setOption("firstLineNumber",number);
 	}
 	
+	function getText(area){
+		return area.getValue();
+	}
+	
 	function setText(area,text){
 		area.setValue(text);
 		area.refresh();
 	}
 	
-	function getText(area){
-		return area.getValue();
+	function getTextOnLines(area,startLine,endLine){
+		return area.getRange(
+			{line:startLine-1,ch:0},
+			{line:endLine-1,ch:999999});
+	}
+	
+	function setTextOnLines(area,startLine,endLine,text){
+		area.replaceRange(text,startLine,endLine);
+	}
+	
+	function getTextOnRange(area,range){
+		return area.getRange(
+			{line:range.start-1,ch:0},
+			{line:range.end-1,ch:999999});
+	}
+	
+	function setTextOnRange(area,range,text){
+		area.replaceRange(text,range.start,range.end);
 	}
 	
 	function getRangeOfLines(startLine,endLine){
 		var range = {};
-		range.from = {line:startLine,ch:0};
-		range.to = {line:endLine,ch:999999};
+		range.start = {line:startLine,ch:0};
+		range.end = {line:endLine,ch:999999};
 		return range;
-	}
-	
-	function createArea(area,options){
-		return CodeMirror.fromTextArea(area,options);
 	}
 	
 	function getPosFromIndex(area,index){
@@ -432,20 +428,16 @@ var CodeReview = (function( CodeReview ) {
 		area.refresh();
 	}
 	
-	function setTextOnRange(area,start,end,text){
-		area.replaceRange(text,start,end);
-	}
-	
 	function saveChanges(area){
 		area.save();
 	}
 	
 	function comparePositions(a,b){
-		return b.from.line-a.from.line;
+		return b.range.start-a.range.start;
 	}
 	
 /********************
-* Merging			*
+* Merging/Diffs		*
 ********************/
 	function computeMerge(){
 		if(!mergeArea){
@@ -466,7 +458,7 @@ var CodeReview = (function( CodeReview ) {
 					result+=text;
 				}
 			}
-			setTextOnRange(mergeArea,diffSet.from,diffSet.to,text);
+			setTextOnRange(mergeArea,diffSet.range,text);
 		}
 		reRender(mergeArea);
 		hideComments();
@@ -476,6 +468,36 @@ var CodeReview = (function( CodeReview ) {
 	function discardMerge(){
 		$("#merge-output").empty();
 		mergeArea = null;
+	}
+	
+	function computeDiffs(originalText,newText){
+		var rawDiffs = diffComputer.diff_main(originalText,newText);
+		diffComputer.diff_cleanupSemantic(rawDiffs);
+		return rawDiffs;
+	}
+	
+	function computeDiffText(rawDiffs){
+		var str = "";
+		for(var index = 0; index<rawDiffs.length; index++){
+			var diff = rawDiffs[index];
+			str+=diff[1];
+		}
+		return str;
+	}
+	
+	function styleDiffArea(area,rawDiffs){
+		var curIndex = 0;
+		var curPos = getPosFromIndex(area,curIndex);
+		for(var index = 0; index<rawDiffs.length; index++){
+			var diff = rawDiffs[index];
+			var type = diff[0];
+			var text = diff[1];
+			var newIndex = curIndex+text.length;
+			var newPos = getPosFromIndex(area,newIndex);
+			styleText(area,curPos,newPos,"diffStyle_"+type);
+			curIndex = newIndex;
+			curPos = newPos;
+		}
 	}
 
 /******************************************************************************
