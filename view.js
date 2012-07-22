@@ -270,19 +270,22 @@ var CodeReview = (function( CodeReview ) {
 					comment.line_end-1);
 				var original = getTextOnLines(codeArea,
 					comment.line_start, comment.line_end);
-				var rawDiffs = diffComputer.diff_main(original,comment.diffs);
-				diffComputer.diff_cleanupSemantic(rawDiffs);
-				rawDiffs.from = range.from;
-				rawDiffs.to = range.to;
-				var str = "";
-				var hasDiffs = false;
-				for(var index = 0; index<rawDiffs.length; index++){
-					var diff = rawDiffs[index];
-					str+=diff[1];
-					hasDiffs = hasDiffs || diff[0];
-				}
-				rawDiffsList[i]=rawDiffs;
-				if(hasDiffs){
+				var diffString = comment.diffs;
+				var diffString = diffString.replace(/\r/gm,'');
+				if(original != diffString){
+					
+					var rawDiffs = diffComputer.diff_main(original,diffString);
+					diffComputer.diff_cleanupSemantic(rawDiffs);
+					rawDiffs.from = range.from;
+					rawDiffs.to = range.to;
+					var str = "";
+					var hasDiffs = false;
+					for(var index = 0; index<rawDiffs.length; index++){
+						var diff = rawDiffs[index];
+						str+=diff[1];
+						hasDiffs = hasDiffs || diff[0];
+					}
+					rawDiffsList[i]=rawDiffs;
 					commentDiv.append(diffs);
 					diffs.text(str);
 				
