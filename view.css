@@ -13,7 +13,9 @@ a {
 }
 
 label{
-	border:200px;
+	float:left;
+	width:200px;
+	margin-right:1em;
 }
 
 .column{

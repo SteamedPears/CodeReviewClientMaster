@@ -130,6 +130,17 @@
 		$.get('/do/languages',function(data) {
 			buildLanguageSelect($('#language_id'),data);
 		});
+		
+		$('#encryption').click(function(){
+			var encrypt = $(this);
+			if(encrypt.is(':checked')){
+				$('#encryptDiv').slideDown();
+			}else{
+				$('#encryptDiv').slideUp();
+			}
+		});
+		
+		$('#encryptDiv').hide();
 
 		// language data
 		getLanguageData(function(language_ob) {

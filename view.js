@@ -27,6 +27,7 @@ var CodeReview = (function( CodeReview ) {
 	commentAreas 	= [],
 	diffComputer 	= new diff_match_patch(),
 	appliedDiffs 	= [];
+	var codeId = null;
 	
 
 	CodeReview.codeArea = undefined;
@@ -439,6 +440,17 @@ var CodeReview = (function( CodeReview ) {
 /********************
 * Merging/Diffs		*
 ********************/
+	function forkCode(){
+		var codeToSubmit;
+		var parent = codeId;
+		if(mergeArea){
+			codeToSubmit = getText(mergeArea);  
+		}else{
+			codeToSubmit = getText(codeArea);
+		}
+		//submit code with POST somehow
+	}
+
 	function computeMerge(){
 		if(!mergeArea){
 			var area = $("<textarea>");
@@ -463,10 +475,12 @@ var CodeReview = (function( CodeReview ) {
 		reRender(mergeArea);
 		hideComments();
 		closeCommentBox();
+		$("#merge-discard-button").show();
 	}
 	
 	function discardMerge(){
 		$("#merge-output").empty();
+		$("#merge-discard-button").hide();
 		mergeArea = null;
 	}
 	
@@ -509,6 +523,7 @@ var CodeReview = (function( CodeReview ) {
 		if((typeof code) === "string"){
 			code = jQuery.parseJSON(code);
 		}
+		codeId = code.id;
 		$('#code-id').val(code.id);
 		var lines = code.text.split('\n');
 		num_lines = lines.length;
@@ -633,7 +648,11 @@ var CodeReview = (function( CodeReview ) {
 			},
 			error:handleAjaxError
 		});
+		
 		$('#merge-compute-button').click(computeMerge);
+		$('#merge-discard-button').click(discardMerge).hide();
+		$('#fork-code-button').click(forkCode);
+		
 		getLanguageData(function(language_ob) {
 			language_data = language_ob;
 			getCode(query.id,writeCodeLines,handleAjaxError);
