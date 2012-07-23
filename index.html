@@ -9,7 +9,7 @@
 		<script src="include/URI.js"></script>
 		<script src="include/CodeMirror/lib/codemirror.js"></script>
 		<script src="index.js"></script>
-		<script src="include/ace/ace.js">
+		<script src="include/ace/ace.js"></script>
 	</head>
 	<body>
 		<h1><a href="index.html">CodeReview</a></h1>
@@ -25,17 +25,37 @@
 			</div>
 			<div class="column">
 				<div>
-					<label for="custom-id">Custom ID:</label>
-					<input type="text" name="custom-id"
-						placeholder="leave blank for random ID"/>
+					<label for="title">Title:</label>
+					<input type="text" name="title" value="Untitled"/>
 				</div>
 				<div>
 					<label for="language_id">Syntax Highlighting:</label>
-					<select id="language_id" name="language_id" />
+					<select id="language_id" name="language_id" ></select>
 				</div>
-				<br>
 				<div>
-					<input type="submit">
+					<label for="parent">Parent Code:</label>
+					<input type="text" name="parent" 
+						placeholder="leave blank if new"/>
+				</div>
+				<div>
+					<label for="customId">Custom ID:</label>
+					<input type="text" name="customId"
+						placeholder="leave blank for random ID"/>
+				</div>
+				
+				<div>
+					<label for="encryption">Encrypt Page:</label>
+					<input type="checkbox" name="encryption" id="encryption"/>
+					<br>
+				</div>
+				
+				<div id="encryptDiv">
+					<label for="password">Password:</label>
+					<input type="password" name="password" />
+				</div>
+				
+				<div>
+					<input type="submit" />
 				</div>
 			</div>
 		</form>
